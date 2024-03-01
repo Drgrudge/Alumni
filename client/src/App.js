@@ -22,7 +22,7 @@ function App() {
           <div className="flex flex-col md:flex-row"> {/* Adjust layout for responsiveness */}
             <SidebarWithContentSeparator className="md:w-1/4" />
             <div className="flex flex-col justify-center items-center w-full">
-              <div className="w-full max-w-screen-lg px-4"> {/* Add padding */}
+              <div className="w-full  px-4"> {/* Add padding */}
                 <Routes>
                   <Route path="/dashboard" element={<DashboardPage />} />
                   <Route path="/forum" element={<ForumPage />} />
