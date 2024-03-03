@@ -13,7 +13,7 @@ const DashboardPage = () => {
           <img role="img" className="w-full h-full overflow-hidden object-cover rounded-full" src="https://tuk-cdn.s3.amazonaws.com/assets/components/grid_cards/gc_2.png" alt="avatar" />
         </div>
         <a tabIndex="0" className="focus:outline-none focus:opacity-75 hover:opacity-75 text-gray-800 dark:text-gray-100 cursor-pointer focus:underline"><h2 className="text-xl tracking-normal font-medium mb-1">Timothy Jon Oliphant</h2></a>
-        <a tabIndex="0" className="cursor-pointer hover:text-indigo-700 focus:underline focus:outline-none focus:text-indigo-700 flex text-gray-600 dark:text-gray-100 text-sm tracking-normal font-normal mb-3 text-center">
+        <a tabIndex="0" className="cursor-pointer hover:text-indigo-700 focus:underline focus:outline-none focus:text-indigo-70cd0 flex text-gray-600 dark:text-gray-100 text-sm tracking-normal font-normal mb-3 text-center">
           <span className="cursor-pointer mr-1 text-gray-600 dark:text-gray-100">
             <img src="https://tuk-cdn.s3.amazonaws.com/can-uploader/full_width_3_section_card-svg1.svg" alt="icon"/>
           </span>
