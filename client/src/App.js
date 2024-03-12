@@ -33,8 +33,8 @@ function App() {
         {isAuthenticated && (
           <div className="flex flex-col md:flex-row">
             <SidebarWithContentSeparator className="md:w-1/4" />
-            <div className="flex flex-col  mt-20 items-center w-full">
-              <div className="w-full max-w-screen-lg px-4">
+            <div className="flex flex-col  mt-20  w-full">
+              <div className="w-full  px-4">
                 <Routes>
                   <Route path="/dashboard" element={<DashboardPage />} />
                   <Route path="/forum" element={<ForumPage />} />
