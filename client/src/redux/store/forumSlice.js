@@ -1,97 +1,124 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
-// Assuming your backend API base URL
-const BASE_URL = 'http://localhost:3000/api/forums';
-
-// Fetch posts async thunk
-export const fetchPosts = createAsyncThunk('forum/fetchPosts', async (_, { getState, rejectWithValue }) => {
-    try {
-        const { auth: { token } } = getState();
-        const response = await axios.get(`${BASE_URL}/posts`, {
-            headers: { Authorization: `Bearer ${token}` },
-        });
-        return response.data;
-    } catch (error) {
-        return rejectWithValue(error.response.data);
-    }
+const axiosInstance = axios.create({
+  baseURL: 'http://localhost:3000/api/forums',
 });
 
-// Create post async thunk
-export const createPost = createAsyncThunk('forum/createPost', async (postContent, { getState, rejectWithValue }) => {
-    try {
-        const { auth: { token } } = getState();
-        const response = await axios.post(`${BASE_URL}/post`, { content: postContent }, {
-            headers: { Authorization: `Bearer ${token}` },
-        });
-        return response.data;
-    } catch (error) {
-        return rejectWithValue(error.response.data);
-    }
-});
+const setAuthToken = (token) => {
+  if (token) {
+    axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+  } else {
+    delete axiosInstance.defaults.headers.common['Authorization'];
+  }
+};
 
-// Create comment async thunk
-export const createComment = createAsyncThunk('forum/createComment', async ({ postId, commentContent }, { getState, rejectWithValue }) => {
+export const fetchPosts = createAsyncThunk(
+  'forum/fetchPosts',
+  async (_, { getState, rejectWithValue }) => {
     try {
-        const { auth: { token } } = getState();
-        const response = await axios.post(`${BASE_URL}/posts/${postId}/comments`, { content: commentContent }, {
-            headers: { Authorization: `Bearer ${token}` },
-        });
-        return response.data; // Assuming this returns the updated post
+      const { auth: { token } } = getState();
+      setAuthToken(token);
+      const response = await axiosInstance.get('/posts');
+      return response.data;
     } catch (error) {
-        return rejectWithValue(error.response.data);
+      return rejectWithValue(error.response.data.message || 'Could not fetch posts');
     }
-});
+  }
+);
+
+export const createPost = createAsyncThunk(
+  'forum/createPost',
+  async (postData, { getState, rejectWithValue }) => {
+    try {
+      const { auth: { token } } = getState();
+      setAuthToken(token);
+      const response = await axiosInstance.post('/posts', postData);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response.data.message || 'Could not create post');
+    }
+  }
+);
+
+// Async thunk for creating a comment
+export const createComment = createAsyncThunk(
+  'forum/createComment',
+  async ({ postId, content }, { getState, rejectWithValue }) => {
+    try {
+      const { auth: { token } } = getState();
+      setAuthToken(token);
+      const response = await axiosInstance.post(`/post/${postId}/comment`, { content });
+      return { postId, comment: response.data };
+    } catch (error) {
+      return rejectWithValue(error.response.data.message || 'Could not add comment');
+    }
+  }
+);
 
 const initialState = {
-    posts: [],
-    status: 'idle', // 'idle' | 'loading' | 'succeeded' | 'failed'
-    error: null,
-    createStatus: 'idle', // Separate status for post creation to manage UI states accordingly
-    createError: null,
+  posts: [],
+  status: 'idle',
+  error: null
 };
 
 const forumSlice = createSlice({
-    name: 'forum',
-    initialState,
-    reducers: {},
-    extraReducers: (builder) => {
-        builder
-            .addCase(fetchPosts.pending, (state) => {
-                state.status = 'loading';
-            })
-            .addCase(fetchPosts.fulfilled, (state, action) => {
-                state.status = 'succeeded';
-                state.posts = action.payload;
-            })
-            .addCase(fetchPosts.rejected, (state, action) => {
-                state.status = 'failed';
-                state.error = action.payload.error;
-            })
-            .addCase(createPost.pending, (state) => {
-                state.createStatus = 'loading';
-            })
-            .addCase(createPost.fulfilled, (state, action) => {
-                state.createStatus = 'succeeded';
-                state.posts.unshift(action.payload);
-            })
-            .addCase(createPost.rejected, (state, action) => {
-                state.createStatus = 'failed';
-                state.createError = action.payload.error;
-            })
-            .addCase(createComment.pending, (state) => {
-                // Optionally handle comment creation pending state
-            })
-            .addCase(createComment.fulfilled, (state, action) => {
-                const updatedPostIndex = state.posts.findIndex(post => post._id === action.payload._id);
-                if (updatedPostIndex !== -1) {
-                    state.posts[updatedPostIndex] = action.payload; // Replace the post with the updated one
-                }
-            })
-            .addCase(createComment.rejected, (state, action) => {
-                // Optionally handle comment creation rejection
-            });
+  name: 'forum',
+  initialState,
+  reducers: {
+    addPost(state, action) {
+      state.posts = [action.payload, ...state.posts];
     },
+    // Reducer to add a comment to a specific post
+    addCommentToPost(state, action) {
+      const { postId, comment } = action.payload;
+      const postIndex = state.posts.findIndex(post => post._id === postId);
+      if (postIndex !== -1) {
+        state.posts[postIndex].comments.push(comment);
+      }
+    },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchPosts.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(fetchPosts.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        state.posts = action.payload;
+      })
+      .addCase(fetchPosts.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.payload || 'Failed to fetch posts';
+      })
+      .addCase(createPost.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(createPost.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        state.posts.unshift(action.payload);
+      })
+      .addCase(createPost.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.payload || 'Failed to create post';
+      })
+      .addCase(createComment.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(createComment.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        const { postId, comment } = action.payload;
+        const postIndex = state.posts.findIndex(post => post._id === postId);
+        if (postIndex !== -1) {
+          state.posts[postIndex].comments.push(comment);
+        }
+      })
+      .addCase(createComment.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.payload || 'Could not add comment';
+      });
+  },
 });
 
+export const { addPost, addCommentToPost } = forumSlice.actions;
 export default forumSlice.reducer;
