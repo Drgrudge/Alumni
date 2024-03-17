@@ -34,7 +34,7 @@ export function SidebarWithContentSeparator() {
   };
 
   return (
-    <Card className="h-100vh w-full max-w-[20rem] p-4 shadow-xl shadow-blue-gray-900/5">
+    <Card className="h-[calc(100vh-2rem)] w-full max-w-[20rem] p-4 shadow-xl shadow-blue-gray-900/5">
       <div className="mb-2 p-4">
         <Typography variant="h5" color="blue-gray">
           Alumni Portal
@@ -45,7 +45,8 @@ export function SidebarWithContentSeparator() {
           <ListItemPrefix>
             <UserCircleIcon className="h-5 w-5" />
           </ListItemPrefix>
-          Profile
+          <Link to="/profile/:userId" className="text-blue-gray-900 hover:text-blue-gray-600">Profile</Link>
+        
         </ListItem>
         <ListItem>
           <ListItemPrefix>
@@ -79,7 +80,6 @@ export function SidebarWithContentSeparator() {
                   <ChevronRightIcon strokeWidth={3} className="h-3 w-5" />
                 </ListItemPrefix>
                 <Link to="/events" className="text-blue-gray-900 hover:text-blue-gray-600">Manage Events</Link>
-                
               </ListItem>
               <ListItem>
                 <ListItemPrefix>
