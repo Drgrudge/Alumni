@@ -27,7 +27,6 @@ const DashboardPage = () => {
         </div>
         
         {/* Add more thread elements here */}
-        
       </div>
     </div>
     );
