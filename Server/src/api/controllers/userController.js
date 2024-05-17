@@ -1,59 +1,106 @@
 // src/controllers/userControllers
 import User from '../models/User.js';
+import Student from '../models/Student.js';
+import Alumni from '../models/Alumni.js';
+import Admin from '../models/Admin.js';
+import Faculty from '../models/Faculty.js';
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 import nodemailer from 'nodemailer';
 import { google } from 'googleapis';
 import dotenv from 'dotenv';
 import jwt from 'jsonwebtoken';
+import validator from 'validator';
 
 dotenv.config();
 
 const OAuth2 = google.auth.OAuth2;
 
 // Register a new user
-export const registerUser = async (req, res) => {
-    try {
-        const { personalDetails, contactInfo, educationHistory, workExperience, password } = req.body;
+export async function registerUser(req, res) {
+    const {
+        userType,
+        email,
+        userId, // This could be studentId, facultyId, alumniId, or adminId depending on the userType
+        dateOfBirth,
+        password
+    } = req.body;
 
-        // Check if the user already exists
-        const userExists = await User.findOne({ 'contactInfo.email': contactInfo.email });
-        if (userExists) {
-            return res.status(400).json({ message: 'User already exists' });
+    try {
+        // Validate user type
+        const validUserTypes = ['student', 'faculty', 'admin', 'alumni'];
+        if (!validUserTypes.includes(userType)) {
+            return res.status(400).json({ message: 'Invalid user type provided.' });
         }
 
-        // Hash the password
-        const hashedPassword = await bcrypt.hash(password, 10);
+        // Validate email
+        if (!validator.isEmail(email)) {
+            return res.status(400).json({ message: 'Invalid email format.' });
+        }
 
-        // Create a new user
-        const user = await User.create({
-            personalDetails,
-            contactInfo,
-            educationHistory,
-            workExperience,
-            password: hashedPassword,
-            // Include other fields as necessary
+        // Validate date of birth
+        const formattedDOB = new Date(dateOfBirth);
+        if (isNaN(formattedDOB.getTime())) {
+            return res.status(400).json({ message: 'Invalid date format.' });
+        }
+
+        // Define model based on user type
+        const RoleModel = { 'student': Student, 'faculty': Faculty, 'admin': Admin, 'alumni': Alumni }[userType];
+
+        // Check role-specific ID and fetch existing data
+        const roleData = await RoleModel.findOne({ [`${userType}Id`]: userId });
+        if (!roleData) {
+            return res.status(400).json({ message: `No authorized ${userType} found with the provided ID.` });
+        }
+
+        // Check for existing user in User model
+        const userExists = await User.findOne({
+            $or: [{ 'contactInfo.email': email }, { 'roleDetails.userId': userId }]
+        });
+        if (userExists) {
+            return res.status(400).json({ message: 'User already exists with this email or ID' });
+        }
+
+        // Create a new user in the User model
+        const newUser = await User.create({
+            userType,
+            personalDetails: { 
+                firstName: roleData.name.split(' ')[0], // Assuming the name is stored as 'First Last'
+                lastName: roleData.name.split(' ')[1] || '',
+            },
+            contactInfo: {
+                email,
+                phone: roleData.phoneNumber || '',
+                address: roleData.address || ''
+            },
+            roleDetails: {
+                userId: userId,
+                ...roleData._doc // Spread operator to copy all relevant role-specific data
+            },
+            dateOfBirth: formattedDOB,
+            password: password
         });
 
-        if (user) {
-            res.status(201).json({
-                _id: user._id,
-                personalDetails: user.personalDetails,
-                contactInfo: user.contactInfo,
-                educationHistory: user.educationHistory,
-                workExperience: user.workExperience
-                // Include other necessary fields in the response
-            });
-        } else {
-            res.status(400).json({ message: 'Invalid user data' });
-        }
+        // Generate a token for the new user
+        const token = jwt.sign(
+            { userId: newUser._id, userType: newUser.userType },
+            process.env.JWT_SECRET,
+            { expiresIn: '1h' }
+        );
+
+        res.status(201).json({
+            _id: newUser._id,
+            userType: newUser.userType,
+            personalDetails: newUser.personalDetails,
+            contactInfo: newUser.contactInfo,
+            token
+        });
     } catch (error) {
+        console.error("Error registering user:", error);
         res.status(500).json({ message: error.message });
     }
 };
-
-
-// loginUser function
+;// loginUser function
 export const loginUser = async (req, res) => {
     try {
         const { email, password } = req.body;

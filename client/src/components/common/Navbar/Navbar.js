@@ -13,24 +13,24 @@ const Navbar = () => {
                 <div className="flex justify-between">
                     <div className="flex space-x-7">
                         <div>
-                <Link to="/dashboard" className="flex items-center py-4 px-2">
-                <img src="https://www.tezu.ernet.in/images/tulogo.png" alt="Logo" className="h-8 w-8 mr-2" />
-                <span className="font-semibold text-white text-lg">Alumni Information System</span>
-                </Link>
-
+                            <a href="#" className="flex items-center py-4 px-2">
+                                <img src="https://www.tezu.ernet.in/images/tulogo.png" alt="Logo" className="h-8 w-8 mr-2"/>
+                                <span className="font-semibold text-white text-lg">Alumni Information System</span>
+                            </a>
                         </div>
                         <div className="hidden md:flex items-center space-x-1">
                             <a href="#" className="py-4 px-2 text-yellow-500 border-b-4 border-yellow-500 font-semibold">Home</a>
                             <a href="#" className="py-4 px-2 text-gray-300 font-semibold hover:text-yellow-500 transition duration-300">Services</a>
                             <a href="#" className="py-4 px-2 text-gray-300 font-semibold hover:text-yellow-500 transition duration-300">About</a>
-                            <Link to="/contact" className="py-4 px-2 text-gray-300 font-semibold hover:text-yellow-500 transition duration-300">Contact Us</Link>
+                            <a href="#" className="py-4 px-2 text-gray-300 font-semibold hover:text-yellow-500 transition duration-300">Contact Us</a>
                         </div>
                     </div>
                     {!isAuthenticated && ( // Only render if not authenticated
-                        <div className="hidden md:flex items-center space-x-3">
-                            <Link to="/login" className="py-2 px-2 font-medium text-gray-300 rounded hover:bg-yellow-500 hover:text-gray-800 transition duration-300">Log In</Link>
-                            <Link to="/signup" className="py-2 px-2 font-medium text-gray-800 bg-yellow-500 rounded hover:bg-yellow-400 transition duration-300">Sign Up</Link>
-                        </div>
+                    <div className="hidden md:flex items-center space-x-3">
+                    <Link to="/login" className="py-2 px-2 font-medium text-gray-300 rounded hover:bg-yellow-500 hover:text-gray-800 transition duration-300">Log In</Link>
+                    <Link to="/register" className="py-2 px-2 font-medium text-gray-800 bg-yellow-500 rounded hover:bg-yellow-400 transition duration-300">Sign Up</Link>
+                </div>
+                
                     )}
                     <div className="md:hidden flex items-center">
                         <button className="outline-none mobile-menu-button" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>

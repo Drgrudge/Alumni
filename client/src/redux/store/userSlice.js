@@ -30,6 +30,19 @@ export const fetchUserProfile = createAsyncThunk(
   }
 );
 
+export const registerUser = createAsyncThunk(
+  'user/registerUser',
+  async (userData, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.post('/register', userData);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response.data.message || 'Could not register user');
+    }
+  }
+);
+
+
 // Async thunk for updating user profile
 export const updateUserProfile = createAsyncThunk(
   'user/updateUserProfile',
@@ -105,6 +118,19 @@ const userSlice = createSlice({
         state.status = 'failed';
         state.error = action.payload || 'Failed to fetch profile';
       })
+
+      .addCase(registerUser.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(registerUser.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        state.profile = action.payload; // Assuming the response includes user profile data
+      })
+      .addCase(registerUser.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.payload || 'Registration failed';
+      })
+      
       .addCase(updateUserProfile.pending, (state) => {
         state.status = 'updating';
       })

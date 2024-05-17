@@ -1,7 +1,8 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes,Navigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import './styles/index.css';
+import RegisterPage from './components/RegistrationPage/RegistrationPage';
 import Navbar from './components/common/Navbar/Navbar';
 import { SidebarWithContentSeparator } from './components/common/LeftNavbar/LeftNavbar';
 import LandingPage from './components/LandingPage/LandingPage';
@@ -101,14 +102,10 @@ function App() {
           </div>
         )}
         <Routes>
-          {!isAuthenticated && <Route path="/login" element={<LoginPage />} />}
           <Route path="/" element={<LandingPage />} />
-                  <Route path="/signup" element={<Signup />} />
-                  <Route path="/contact" element={<Contact />} />
-          {/* Public Job Routes */}
-          
-          {!isAuthenticated && <Route path="/dashboard" element={<DashboardPage />} />}
-          {/* Other public routes */}
+          {/* Conditional rendering based on authentication state */}
+          <Route path="/login" element={!isAuthenticated ? <LoginPage /> : <Navigate to="/dashboard" />} />
+          <Route path="/register" element={!isAuthenticated ? <RegisterPage /> : <Navigate to="/dashboard" />} />
         </Routes>
         <Footer />
       </div>

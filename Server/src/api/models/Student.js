@@ -1,19 +1,19 @@
 import mongoose from 'mongoose';
 
 const studentSchema = new mongoose.Schema({
-  name: { type: String, required: true },
-  studentId: { type: String, required: true, unique: true },
-  email: { type: String, required: true, unique: true },
+  name: { type: String, required: true, trim: true },
+  studentId: { type: String, required: true, unique: true, trim: true },
+  email: { type: String, required: true, unique: true, trim: true },
   department: { type: String, required: true },
   enrollmentYear: { type: Number, required: true },
   graduationYear: Number,
   phoneNumber: String,
   address: String,
-  dateOfBirth: Date,
+  dateOfBirth: { type: Date, required: true },
   nationality: String,
   gender: String,
   program: String,
-  status: String, // e.g., 'active', 'graduated', 'withdrawn'
+  status: String, // e.g., "active", "graduated", "withdrawn"
   courses: [{
     courseCode: String,
     courseName: String,
@@ -22,10 +22,10 @@ const studentSchema = new mongoose.Schema({
   }],
   gpa: Number,
   // New fields for signup and verification
-  isInvited: { type: Boolean, default: false }, // To indicate if the student is eligible for signup
-  isRegistered: { type: Boolean, default: false }, // To indicate if the student has completed the registration
-  signupToken: { type: String, default: null }, // The verification token for completing the signup process
-  tokenExpiration: { type: Date, default: null } // Expiration time for the signup token
+  // isInvited: { type: Boolean, default: false },
+  isRegistered: { type: Boolean, default: false },
+  signupToken: { type: String, default: null },
+  tokenExpiration: { type: Date, default: null }
 });
 
 const Student = mongoose.model('Student', studentSchema);
