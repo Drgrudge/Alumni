@@ -46,7 +46,7 @@ const ChatListSidebar = () => {
     };
 
     return (
-        <div className="w-64 bg-gray-100 border-r h-full">
+        <div className="w-64 bg-gray-100 border-r flex flex-col h-full">
             <div className="p-4 border-b flex justify-between items-center bg-indigo-600 text-white">
                 <h2 className="text-lg font-semibold">{showUsersList ? 'Users' : 'Chats'}</h2>
                 <button
@@ -70,7 +70,7 @@ const ChatListSidebar = () => {
                     <li 
                         key={user._id} 
                         onClick={() => handleUserClick(user)}
-                        className={`p-4 cursor-pointer hover:bg-gray-200 ${activeChat && activeChat._id === user._id ? 'bg-blue-100' : ''}`}
+                        className={`p-4  cursor-pointer hover:bg-gray-200 ${activeChat && activeChat._id === user._id ? 'bg-blue-100' : ''}`}
                     >
                         {/* Circular user photo */}
                         <div className="flex items-center">

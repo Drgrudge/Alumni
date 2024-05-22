@@ -23,7 +23,7 @@ import CreateJobPage from './components/JobPostingPage/CreateJobPage'; // Create
 import JobDetailsPage from './components/JobPostingPage/JobDetailsPage'; // Job details page
 import EditJobPage from './components/JobPostingPage/EditJobPage';
 //import UploadCSV from './components/UploadCSV/UploadCSV';
-import Contact from './components/Contact/Contact';
+import Contact from './components/ContactUs/ContactUs';
 // Import the event components
 import EventListPage from './components/EventPage/EventListPage';
 import CreateEventPage from './components/EventPage/CreateEventPage';
@@ -42,6 +42,8 @@ import ChatPage from './components/ChatPage/ChatPage'; // Adjust path based on y
 import MakeDonationPage from './components/DonationPage/MakeDonationPage';
 import DonationAnalyticsComponent from './components/DonationPage/donationAnalytics';
 import DonationHistory from './components/DonationPage/DonationHistory';
+import AboutUs from './components/AboutPage/AboutPage';
+import ContactUs from './components/ContactUs/ContactUs';
 
 
 function App() {
@@ -66,6 +68,8 @@ function App() {
                   <Route path="/donation-analytics" element={<DonationAnalyticsComponent />} />
                   <Route path="/donation-history" element={<DonationHistory />} />
                   <Route path="/upload-students" element={<UploadStudentsPage />} />
+                  <Route path="/about-us" element={<AboutUs />} />
+                  <Route path="/contact-us" element={<ContactUs />} />
                   {/* Protected Job Routes */}
                   
                   <Route path="/jobs/create" element={<CreateJobPage />} />

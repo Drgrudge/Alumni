@@ -74,6 +74,11 @@ const PostList = () => {
                                 </p>
                             </div>
                         </div>
+                        <img 
+                            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTEXx7xA8BGtL4i1mF-RScFOnSUMkf5afQ1PQ1nCwSb8Q&s" 
+                            alt="Demo" 
+                            className="w-full h-48 object-cover mt-2 rounded"
+                        />
                         <p className="mt-2">{post.content}</p>
                         <div className="flex items-center justify-between mt-4">
                             <div className="flex items-center">
@@ -82,7 +87,7 @@ const PostList = () => {
                                     onClick={() => handleLike(post._id)} 
                                 />
                                 <span>{likedPosts.filter(id => id === post._id).length}</span>
-                                <FaComment className="cursor-pointer" onClick={() => toggleComments(post._id)} />
+                                <FaComment className="ml-4 cursor-pointer" onClick={() => toggleComments(post._id)} />
                             </div>
                         </div>
                         {showComments[post._id] && (

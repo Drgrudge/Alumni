@@ -17,6 +17,7 @@ dotenv.config();
 const OAuth2 = google.auth.OAuth2;
 
 // Register a new user
+
 export async function registerUser(req, res) {
     const {
         userType,
@@ -100,7 +101,9 @@ export async function registerUser(req, res) {
         res.status(500).json({ message: error.message });
     }
 };
-;// loginUser function
+
+
+// loginUser function
 export const loginUser = async (req, res) => {
     try {
         const { email, password } = req.body;

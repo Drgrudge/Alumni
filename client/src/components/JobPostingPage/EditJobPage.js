@@ -1,7 +1,8 @@
+// components/EditJobPage/EditJobPage.js
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useSelector } from 'react-redux'; // Import useSelector to access the auth token from the state
+import { useSelector } from 'react-redux';
 
 const EditJobPage = () => {
   const { jobId } = useParams();
@@ -12,14 +13,16 @@ const EditJobPage = () => {
     location: '',
     company: '',
     type: '',
-    applyLink: ''
+    applyLink: '',
+    lastDateToApply: '',
+    image: null,
   });
   const handleGoBack=()=>{
     navigate(-1);
   };
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const { token } = useSelector(state => state.auth); // Access the auth token from the state
+  const { token } = useSelector(state => state.auth);
 
   useEffect(() => {
     const fetchJobDetails = async () => {
@@ -50,12 +53,25 @@ const EditJobPage = () => {
     }));
   };
 
+  const handleFileChange = (e) => {
+    setJob(prevJob => ({
+      ...prevJob,
+      image: e.target.files[0],
+    }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const data = new FormData();
+    for (const key in job) {
+      data.append(key, job[key]);
+    }
+
     try {
-      await axios.put(`http://localhost:3000/api/jobs/update/${jobId}`, job, {
+      await axios.put(`http://localhost:3000/api/jobs/update/${jobId}`, data, {
         headers: {
           Authorization: `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data',
         },
       });
       navigate('/jobs');
@@ -72,8 +88,6 @@ const EditJobPage = () => {
     <div className="max-w-4xl border-2 border-sky-500 shadow-inherit mx-auto mb-10 p-4">
       <h2 className="text-xl font-semibold mb-4">Edit Job</h2>
       <button onClick={handleGoBack} className="absolute top-4 right-4">
-        {/* Insert your back button icon here */}
-        {/* For example, using an SVG icon */}
         <svg
           xmlns="http://www.w3.org/2000/svg"
           className="h-6 w-6 text-gray-500 hover:text-gray-700 cursor-pointer"
@@ -118,6 +132,14 @@ const EditJobPage = () => {
         <div>
           <label htmlFor="applyLink" className="block text-sm font-medium text-gray-700">Apply Link</label>
           <input type="text" name="applyLink" id="applyLink" value={job.applyLink} onChange={handleChange} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50" />
+        </div>
+        <div>
+          <label htmlFor="lastDateToApply" className="block text-sm font-medium text-gray-700">Last Date to Apply</label>
+          <input type="date" name="lastDateToApply" id="lastDateToApply" value={job.lastDateToApply} onChange={handleChange} required className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50" />
+        </div>
+        <div>
+          <label htmlFor="image" className="block text-sm font-medium text-gray-700">Image</label>
+          <input type="file" name="image" id="image" accept="image/*" onChange={handleFileChange} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50" />
         </div>
         <button type="submit" className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
           Update Job

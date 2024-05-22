@@ -1,91 +1,123 @@
-import React from 'react';
+import React, { useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { Link } from "react-router-dom";
+import {
+  fetchTotalDonationsByMonth,
+  fetchTotalUniqueDonors,
+  fetchTotalRepeatedDonors,
+  fetchTopDonors,
+  fetchAverageDonationAmount,
+  fetchDonationFrequency,
+} from "../../../redux/store/donationAnalyticsSlice";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  PieController,
+  Title,
+  Tooltip,
+  Legend,
+} from "chart.js";
+import { Bar, Pie } from "react-chartjs-2";
+import { Chart, ArcElement } from "chart.js";
+
+// Register the chart components
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  PieController,
+  Title,
+  Tooltip,
+  Legend
+);
+Chart.register(ArcElement);
 
 const DonationStatistics = () => {
+  const dispatch = useDispatch();
+  const { data, status, error } = useSelector(
+    (state) => state.donationAnalytics || {}
+  );
+
+  useEffect(() => {
+    dispatch(fetchTotalDonationsByMonth());
+    dispatch(fetchTotalUniqueDonors());
+    dispatch(fetchTotalRepeatedDonors());
+    dispatch(fetchTopDonors());
+    dispatch(fetchAverageDonationAmount());
+    dispatch(fetchDonationFrequency());
+  }, [dispatch]);
+
+  // Prepare the chart data for Total Donations by Month
+
+  const pieOptions = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: "top",
+      },
+      title: {
+        display: true,
+        text: "Top Donors",
+      },
+    },
+  };
+
+  // Prepare the chart data for Top Donors
+  const topDonorsData = data.topdonors && {
+    labels: data.topdonors.map((donor) => donor.name),
+    datasets: [
+      {
+        label: "Top Donors",
+        data: data.topdonors.map((donor) => donor.totalAmount),
+        backgroundColor: [
+          "rgba(255, 99, 132, 0.5)",
+          "rgba(54, 162, 235, 0.5)",
+          "rgba(255, 206, 86, 0.5)",
+          "rgba(75, 192, 192, 0.5)",
+          "rgba(153, 102, 255, 0.5)",
+          "rgba(255, 159, 64, 0.5)",
+          "rgba(255, 99, 132, 0.5)",
+          "rgba(54, 162, 235, 0.5)",
+          "rgba(255, 206, 86, 0.5)",
+          "rgba(75, 192, 192, 0.5)",
+        ],
+        borderColor: [
+          "rgba(255, 99, 132, 1)",
+          "rgba(54, 162, 235, 1)",
+          "rgba(255, 206, 86, 1)",
+          "rgba(75, 192, 192, 1)",
+          "rgba(153, 102, 255, 1)",
+          "rgba(255, 159, 64, 1)",
+          "rgba(255, 99, 132, 1)",
+          "rgba(54, 162, 235, 1)",
+          "rgba(255, 206, 86, 1)",
+          "rgba(75, 192, 192, 1)",
+        ],
+        borderWidth: 1,
+      },
+    ],
+  };
+
   return (
-    <div className="flex items-center border-2 rounded-lg justify-center">
-      <div className="md:w-96 p-5 text-gray-500 bg-white">
-        <h1 className="pt-2 pb-7 text-gray-800 font-bold text-lg">
-          Recent Updates
-        </h1>
-        <div className="h-40 overflow-hidden relative"> {/* Adjust height as needed */}
-          <div className="absolute w-full animate-scroll">
-            <div className="flex items-center justify-between mb-5">
-              <div className="flex items-center">
-                <div className="w-12 h-12 flex items-center justify-center bg-purple-200">
-                  <img
-                    src="https://tuk-cdn.s3.amazonaws.com/can-uploader/card3-svg1.svg"
-                    alt="cart"
-                  />
-                </div>
-                <a
-                  href="#"
-                  className="focus:outline-none focus:underline focus:text-gray-400 text-gray-600 hover:text-gray-500"
-                >
-                  <p className="text-sm font-medium pl-3">Btech admisssion Notification</p>
-                </a>
+    <div className="">
+      {status === "loading" && <p>Loading...</p>}
+      {status === "failed" && <p>Error loading the analytics data: {error}</p>}
+      {status === "succeeded" && (
+        <>
+          <div className="w-full  ">
+            {data.topdonors && data.topdonors.length > 0 && (
+              <div className="border-2 p-4 h-full rounded-lg  bg-cyan-200 ">
+                <h3 className="mb-2 text-lg text-center font-semibold">
+                  Top Donors Pie Chart
+                </h3>
+                <Pie data={topDonorsData} options={pieOptions} />
               </div>
-            
-            </div>
-            <div className="flex items-center justify-between mb-5">
-              <div className="flex items-center">
-                <div className="w-12 h-12 flex items-center justify-center bg-green-200">
-                  <img
-                    src="https://tuk-cdn.s3.amazonaws.com/can-uploader/card3-svg2.svg"
-                    alt="message"
-                  />
-                </div>
-                <a
-                  href="#"
-                  className="focus:outline-none focus:underline focus:text-gray-400 text-gray-600 hover:text-gray-500"
-                >
-                  <p className="text-sm font-medium pl-3">
-                    Phd and Mtech admission
-                  </p>
-                </a>
-              </div>
-            </div>
-            <div className="flex items-center justify-between mb-5">
-              <div className="flex items-center">
-                <div className="w-12 h-12 flex items-center justify-center bg-purple-200">
-                  <img
-                    src="https://tuk-cdn.s3.amazonaws.com/can-uploader/card3-svg1.svg"
-                    alt="cart"
-                  />
-                </div>
-                <a
-                  href="#"
-                  className="focus:outline-none focus:underline focus:text-gray-400 text-gray-600  hover:text-gray-500"
-                >
-                  <p className="text-sm font-medium pl-3">Placement Notification</p>
-                </a>
-              </div>
-            
-            </div>
-            <div className="flex items-center justify-between mb-5">
-              <div className="flex items-center">
-                <div className="w-12 h-12 flex items-center justify-center bg-green-200">
-                  <img
-                    src="https://tuk-cdn.s3.amazonaws.com/can-uploader/card3-svg3.svg"
-                    alt="text"
-                  />
-                </div>
-                <a
-                  href="#"
-                  className="focus:outline-none focus:underline focus:text-gray-400 text-gray-600  hover:text-gray-500"
-                >
-                  <p className="text-sm font-medium pl-3">ALUMNI MEETUP</p>
-                </a>
-              </div>
-              <a
-                href="#"
-                className="focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-800 rounded-md focus:text-indigo-800 hover:text-indigo-800 text-indigo-700"
-              >
-        
-              </a>
-            </div>
+            )}
           </div>
-        </div>
-      </div>
+        </>
+      )}
     </div>
   );
 };

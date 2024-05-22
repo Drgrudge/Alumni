@@ -1,23 +1,15 @@
 // routes/jobRoutes.js
 import express from 'express';
 import jobController from '../controllers/jobController.js';
-import authenticate from '../../middleware/authenticate.js'; // Ensure this path is correct
+import authenticate from '../../middleware/authenticate.js';
+import upload from '../../middleware/upload.js'; // Import the upload middleware
 
 const router = express.Router();
 
-// Route to create a new job posting
-router.post('/create', authenticate, jobController.createJob);
-
-// Route to get all job postings
+router.post('/create', authenticate, upload, jobController.createJob);
 router.get('/all', jobController.getAllJobs);
-
-// Route to get a specific job posting by ID
 router.get('/:jobId', jobController.getJobById);
-
-// Route to update a specific job posting
-router.put('/update/:jobId', authenticate, jobController.updateJob);
-
-// Route to delete a specific job posting
+router.put('/update/:jobId', authenticate, upload, jobController.updateJob);
 router.delete('/delete/:jobId', authenticate, jobController.deleteJob);
 
 export default router;

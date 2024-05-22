@@ -22,7 +22,7 @@ const JobBoard = () => {
   return (
     <div className=''>
 
-      <h2 className="text-xl text-center font-bold mb-2">Latest Job Listing</h2>
+      <h2 className="text-xl text-center font-bold text-cyan-50">Latest Job Listing</h2>
       {latestJob ? (
         <div className="py-3 flex justify-center">
           <div className="bg-white p-4 rounded shadow-md w-fit">

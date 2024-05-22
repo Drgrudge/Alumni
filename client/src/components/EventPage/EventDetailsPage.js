@@ -1,17 +1,25 @@
+// components/EventPage/EventDetailsPage.js
 import React, { useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom"; // Importing useNavigate
+import { useParams, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { fetchEventById } from "../../redux/store/eventSlice"; // Adjust import paths as necessary
+import { fetchEventById, selectEventById } from "../../redux/store/eventSlice";
 
 const EventDetailsPage = () => {
   const { eventId } = useParams();
   const dispatch = useDispatch();
-  const navigate = useNavigate(); // Using useNavigate
-  const { event, status, error } = useSelector((state) => state.events);
+  const navigate = useNavigate();
+  const event = useSelector(state => selectEventById(state, eventId));
+  const { status, error } = useSelector((state) => state.events);
 
   useEffect(() => {
     dispatch(fetchEventById(eventId));
   }, [dispatch, eventId]);
+
+  useEffect(() => {
+    if (event) {
+      console.log('Event image URL:', event.imageUrl); // Debug log
+    }
+  }, [event]);
 
   const handleGoBack = () => {
     navigate(-1); // Navigating back
@@ -64,15 +72,13 @@ const EventDetailsPage = () => {
         </div>
         <div className="hidden lg:block lg:w-3/5 xl:w-3/5 w-full lg:mt-0 mt-6">
           <img
-            src="https://i.ibb.co/SKLJ7WX/austin-distel-jp-Hw8ndw-J-Q-unsplash-1.png"
-            alt="ongoing meeting"
-            className="w-full obejct-fit object-center object-fill h-full"
+            src={event.imageUrl}
+            alt="event"
+            className="w-full object-cover object-center object-fill h-full"
           />
         </div>
       </div>
       <button onClick={handleGoBack} className="absolute top-4 right-4">
-        {/* Insert your back button icon here */}
-        {/* For example, using an SVG icon */}
         <svg
           xmlns="http://www.w3.org/2000/svg"
           className="h-6 w-6 text-gray-500 hover:text-gray-700 cursor-pointer"

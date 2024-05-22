@@ -1,4 +1,4 @@
-// profileRoutes.js
+// In your profileRoutes.js
 import express from 'express';
 import ProfileController from '../controllers/profileController.js';
 import authenticate from '../../middleware/authenticate.js'; // Ensure this path is correct based on your project structure
@@ -16,8 +16,7 @@ router.put('/profile', authenticate, ProfileController.editProfile);
 // Update the authenticated user's privacy settings
 router.put('/privacy', authenticate, ProfileController.updatePrivacySettings);
 
-// Optionally, if you implement creation of new user profiles and wish to protect it as well,
-// uncomment the following line and ensure you have a `createProfile` method in your `ProfileController`
-// router.post('/profile', authenticate, ProfileController.createProfile);
+// Upload profile picture
+router.post('/upload', authenticate, ProfileController.uploadProfilePicture, ProfileController.handleProfilePictureUpload);
 
 export default router;

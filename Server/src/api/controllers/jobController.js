@@ -1,17 +1,24 @@
 // controllers/jobController.js
 import Job from '../models/Job.js';
-import User from '../models/User.js'; // Import the User model to fetch users
+import User from '../models/User.js';
 import NotificationController from './NotificationController.js';
 
 const jobController = {
     createJob: async (req, res) => {
         try {
-            const { title, description, location, company, type, applyLink, author, image } = req.body;
-            const newJob = new Job({ title, description, location, company, type, applyLink, author, image });
+            const { title, description, location, company, type, applyLink, author, lastDateToApply, imageUrl } = req.body;
+
+            // Check if an image file was uploaded
+            let image = imageUrl;
+            if (req.file) {
+                image = `/uploads/images/${req.file.filename}`;
+            }
+
+            const newJob = new Job({ title, description, location, company, type, applyLink, author, lastDateToApply, image });
             await newJob.save();
 
             // Notify users about the new job posting
-            const users = await User.find({}); // Fetch users to be notified (adjust logic as needed)
+            const users = await User.find({});
             users.forEach(user => {
                 NotificationController.createNotification(
                     user._id,
@@ -50,10 +57,14 @@ const jobController = {
 
     updateJob: async (req, res) => {
         try {
-            const { image } = req.body;
+            const { imageUrl } = req.body;
             const updatedJobData = { ...req.body };
-            if (image) {
-                updatedJobData.image = image; // If image is provided, update the image field
+
+            // Check if an image file was uploaded
+            if (req.file) {
+                updatedJobData.image = `/uploads/images/${req.file.filename}`;
+            } else if (imageUrl) {
+                updatedJobData.image = imageUrl;
             }
 
             const updatedJob = await Job.findByIdAndUpdate(req.params.jobId, updatedJobData, { new: true });
@@ -61,7 +72,7 @@ const jobController = {
                 return res.status(404).json({ message: 'Job not found' });
             }
 
-            // Notify all users about the job update...
+            // Notify users about the job update
             const users = await User.find({});
             users.forEach(user => {
                 NotificationController.createNotification(
@@ -78,31 +89,26 @@ const jobController = {
         }
     },
 
-
     deleteJob: async (req, res) => {
         try {
             const job = await Job.findById(req.params.jobId);
             if (!job) {
                 return res.status(404).json({ message: 'Job not found' });
             }
-    
-            // Assuming req.user is populated by your authentication middleware
+
             const isAuthor = job.author.equals(req.user._id);
             const isAdmin = req.user.userType === 'admin';
-    
+
             if (!isAuthor && !isAdmin) {
                 return res.status(403).json({ message: 'Not authorized to delete this job' });
             }
-    
-            // Store job details for notification before deletion
+
             const jobTitle = job.title;
             const jobCompany = job.company;
-    
-            await job.remove();
-    
-            // Notify users about the job deletion
-            // Replace the placeholder with actual logic to find interested users
-            const interestedUsers = await User.find({}); // Example: Find users who favorited or applied to this job
+
+            await Job.findByIdAndDelete(req.params.jobId);
+
+            const interestedUsers = await User.find({});
             interestedUsers.forEach(user => {
                 NotificationController.createNotification(
                     user._id,
@@ -111,13 +117,12 @@ const jobController = {
                     `/jobs`
                 );
             });
-    
+
             res.status(200).json({ message: 'Job deleted successfully' });
         } catch (error) {
             res.status(500).json({ message: error.message });
         }
     },
-    
 };
 
 export default jobController;

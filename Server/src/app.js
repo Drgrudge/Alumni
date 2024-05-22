@@ -63,6 +63,7 @@ app.use('/api/directory', userDirectoryRoutes);
 app.use('/api', studentUploadRoutes);
 app.use('/api/analytics', analyticsRoutes);
 // app.use('/api/faculty', facultyRoutes);
+app.use('/uploads', express.static('uploads'));
 
 
 

@@ -1,3 +1,4 @@
+// redux/store/jobSlice.js
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import axios from 'axios';
 
@@ -22,37 +23,47 @@ export const fetchJobById = createAsyncThunk('jobs/fetchJobById', async (jobId, 
   }
 });
 
-// Modified createJob async thunk to include authentication
+// Create job async thunk
 export const createJob = createAsyncThunk(
-    'jobs/createJob',
-    async (jobData, { getState, rejectWithValue }) => {
-        const state = getState();
-        const token = state.auth.token; // Retrieve the token
-        const authorId = state.auth.user.id; // Retrieve the user ID to use as the author
-        
-        // Include the author ID in the jobData payload
-        const payload = { ...jobData, author: authorId };
+  'jobs/createJob',
+  async (jobData, { getState, rejectWithValue }) => {
+    const state = getState();
+    const token = state.auth.token; // Retrieve the token
+    const authorId = state.auth.user.id; // Retrieve the user ID to use as the author
+    
+    // Include the author ID in the jobData payload
+    jobData.append('author', authorId);
 
-        try {
-            console.log("Authorization Header: ", `Bearer ${token}`);
-            const response = await axios.post(`${BASE_URL}/create`, payload, {
-                headers: {
-                    Authorization: `Bearer ${token}`, // Include the token in the request headers
-                },
-            });
-            return response.data;
-        } catch (error) {
-            console.error("Job creation error: ", error.response ? error.response.data : error);
-            return rejectWithValue(error?.response?.data || 'Unexpected error occurred');
-        }
+    try {
+      console.log("Authorization Header: ", `Bearer ${token}`);
+      const response = await axios.post(`${BASE_URL}/create`, jobData, {
+        headers: {
+          Authorization: `Bearer ${token}`, // Include the token in the request headers
+          'Content-Type': 'multipart/form-data', // Ensure the content type is multipart/form-data
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Job creation error: ", error.response ? error.response.data : error);
+      return rejectWithValue(error?.response?.data || 'Unexpected error occurred');
     }
+  }
 );
 
+// Update job async thunk
 export const updateJob = createAsyncThunk('jobs/updateJob', async ({ jobId, jobData }, { getState, rejectWithValue }) => {
   const { token } = getState().auth;
+  const formData = new FormData();
+  for (const key in jobData) {
+    formData.append(key, jobData[key]);
+  }
+
   try {
-    const response = await axios.put(`${BASE_URL}/update/${jobId}`, jobData, {
-      headers: { Authorization: `Bearer ${token}` },
+    const response = await axios.put(`${BASE_URL}/update/${jobId}`, formData, {
+      headers: { 
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'multipart/form-data'
+      },
     });
     return response.data;
   } catch (error) {
@@ -60,6 +71,7 @@ export const updateJob = createAsyncThunk('jobs/updateJob', async ({ jobId, jobD
   }
 });
 
+// Delete job async thunk
 export const deleteJob = createAsyncThunk('jobs/deleteJob', async (jobId, { getState, rejectWithValue }) => {
   const { token } = getState().auth;
   try {
@@ -146,5 +158,9 @@ const jobSlice = createSlice({
       });
   },
 });
+
+// Selectors
+export const selectAllJobs = (state) => state.jobs.jobs;
+export const selectJobById = (state, jobId) => state.jobs.jobs.find(job => job._id === jobId);
 
 export default jobSlice.reducer;

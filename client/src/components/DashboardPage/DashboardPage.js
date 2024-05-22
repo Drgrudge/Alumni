@@ -5,30 +5,37 @@ import JobBoard from "./JobBoard/JobBoard";
 import RecentNews from "./RecentNews/RecentNews";
 import DashboardStatistics from "./DasboardStatistics/DashboardStatistics";
 import DonationStatistics from "./DonationStatistics/DonationStatistics";
+import Highlights from "./Highlights/Highlights";
 
 const DashboardPage = () => {
   return (
     <>
-      <div className="flex border bg-slate-400 w-full">
-        <div className="m-6 w-2/3  ">
-          <UserProfileSummary/>
+      <div className="">
+        <div className="flex border bg-slate-400 w-full">
+          <div className="m-6 w-2/3  ">
+            <UserProfileSummary />
+          </div>
+          <div className="m-6 ">
+            <RecentNews />
+          </div>
         </div>
-        <div className="m-6 ">
-        <RecentNews />
+
+        <div className="mt-4">
+          <DashboardStatistics />
         </div>
-      </div>
+        <Highlights />
 
-      <div className="mt-4">
-    <DashboardStatistics/>
-    </div>
+        <div className="flex w-full h-full mt-10  text-gray-500 ">
+          {/* Content on the left */}
+          <div className="flex flex-row justify-around  w-full h-full border-2 bg-indigo-600 rounded-lg">
+            <DashBoardEvents />
+            <JobBoard />
+          </div>
 
-      <div className=" flex  justify-around  w-full mt-10  text-gray-500 ">
-        {/* Content on the left */}
-        <DashBoardEvents />
-        <JobBoard />
-        {/* <DonationStatistics/> */}
-
-
+          <div className="ml-4 w-1/3  rounded-lg border-2 ">
+            <DonationStatistics />
+          </div>
+        </div>
       </div>
     </>
   );

@@ -1,13 +1,17 @@
 import React, { useState, useRef, useEffect } from 'react';
+import PhotoUpload from './PhotoUpload';
 
 const CreatePost = ({ onCreate }) => {
     const [content, setContent] = useState('');
+    const [photo, setPhoto] = useState(null);
     const [showPostForm, setShowPostForm] = useState(false);
     const postFormRef = useRef(null);
 
-    const handleSubmit = () => {
-        onCreate(content);
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        onCreate({ content, photo });
         setContent('');
+        setPhoto(null);
         setShowPostForm(false); // Close the post form overlay after submission
     };
 
@@ -29,13 +33,14 @@ const CreatePost = ({ onCreate }) => {
         <div>
             {showPostForm && (
                 <div className="post-form-overlay fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 z-50 flex justify-center items-center">
-                    <div ref={postFormRef} className="post-form bg-white p-10 rounded-lg relative">
+                    <div ref={postFormRef} className="post-form bg-white p-10 h-4/5 rounded-lg relative">
                         <button className="absolute top-2 right-2 text-gray-500" onClick={() => setShowPostForm(false)}>
                             &#10005;
                         </button>
-                        <form onSubmit={handleSubmit} className="w-full">
+                        <form onSubmit={handleSubmit} className="w-full h-full">
+                            <PhotoUpload onPhotoChange={setPhoto} />
                             <textarea
-                                className="border p-2 rounded mb-4 w-full h-40"
+                                className="border p-2 rounded mb-4 w-full h-2/4"
                                 placeholder="Write something..."
                                 value={content}
                                 onChange={(e) => setContent(e.target.value)}
