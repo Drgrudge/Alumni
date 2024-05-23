@@ -1,111 +1,268 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import axios from 'axios';
 
-// Assuming the token is stored in the auth slice of the Redux store
 const axiosInstance = axios.create({
-  baseURL: 'http://localhost:3000/api/messages'
+    baseURL: 'http://localhost:3000/api/messages'
 });
 
-// Thunk for fetching the list of users
 export const fetchUsers = createAsyncThunk(
-  'chatting/fetchUsers',
-  async (_, { getState }) => {
-    const { auth: { token } } = getState();
-    if (token) {
-      axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    'chatting/fetchUsers',
+    async (_, { getState, rejectWithValue }) => {
+        try {
+            const { auth: { token } } = getState();
+            if (token) {
+                axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+            }
+            const response = await axiosInstance.get('/users');
+            return response.data;
+        } catch (error) {
+            return rejectWithValue(error.response.data);
+        }
     }
-    const response = await axiosInstance.get('/users');
-    return response.data;
-  }
 );
 
-// Thunk for fetching conversations with a specific user
 export const fetchConversations = createAsyncThunk(
-  'chatting/fetchConversations',
-  async (otherUserId, { getState }) => {
-    const { auth: { token } } = getState();
-    if (token) {
-      axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    'chatting/fetchConversations',
+    async (otherUserId, { getState, rejectWithValue }) => {
+        try {
+            const { auth: { token } } = getState();
+            if (token) {
+                axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+            }
+            const response = await axiosInstance.get(`/conversation/${otherUserId}`);
+            console.log('fetchConversations response:', response.data);
+            return response.data;
+        } catch (error) {
+            console.error('fetchConversations error:', error.response.data);
+            return rejectWithValue(error.response.data);
+        }
     }
-    console.log(`Fetching conversations for user ID: ${otherUserId}`);
-
-
-    const response = await axiosInstance.get(`/conversation/${otherUserId}`);
-    return response.data;
-  }
 );
 
-// Thunk for sending a message
 export const sendMessage = createAsyncThunk(
   'chatting/sendMessage',
-  async ({ receiverId, content }, { getState }) => {
-    const { auth: { token } } = getState();
-    if (token) {
-      axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-    }
-    const response = await axiosInstance.post('/send', { receiverId, content });
-    return response.data;
+  async ({ receiverId, content }, { getState, rejectWithValue }) => {
+      try {
+          const { auth: { token } } = getState();
+          if (token) {
+              axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+          }
+          const response = await axiosInstance.post('/send', { receiverId, content });
+          console.log('Response from sendMessage:', response.data.data); // Log the response
+          return response.data.data; // Return the message data including the sender
+      } catch (error) {
+          return rejectWithValue(error.response.data);
+      }
   }
 );
 
 export const fetchConversationsList = createAsyncThunk(
-  'chatting/fetchConversationsList',
-  async (_, { getState }) => {
-      const { auth: { token } } = getState();
-      // Set the Authorization header for this request without affecting global axios defaults
-      const config = token ? {
-        headers: { 'Authorization': `Bearer ${token}` }
-      } : {};
+    'chatting/fetchConversationsList',
+    async (_, { getState, rejectWithValue }) => {
+        try {
+            const { auth: { token } } = getState();
+            const config = token ? {
+                headers: { 'Authorization': `Bearer ${token}` }
+            } : {};
+            const response = await axiosInstance.get('/list', config);
+            return response.data;
+        } catch (error) {
+            return rejectWithValue(error.response.data);
+        }
+    }
+);
 
+export const markMessageAsRead = createAsyncThunk(
+    'chatting/markMessageAsRead',
+    async (messageId, { getState, rejectWithValue }) => {
+        try {
+            const { auth: { token } } = getState();
+            if (token) {
+                axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+            }
+            const response = await axiosInstance.post(`/messages/${messageId}/read`);
+            return response.data;
+        } catch (error) {
+            return rejectWithValue(error.response.data);
+        }
+    }
+);
+
+export const editMessage = createAsyncThunk(
+  'chatting/editMessage',
+  async ({ messageId, content }, { getState, rejectWithValue }) => {
       try {
-        const response = await axiosInstance.get('/list', config);
-        console.log('Conversations List:', response.data);
-        return response.data;
+          const { auth: { token } } = getState();
+          if (token) {
+              axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+          }
+          const response = await axiosInstance.put(`/messages/${messageId}`, { content });
+          return response.data;  // Ensure this includes sender and receiver details
       } catch (error) {
-        // Handle error appropriately
-        console.error('Error fetching conversations list:', error);
-        return [];  // Return an empty array or appropriate error handling
+          return rejectWithValue(error.response.data);
       }
   }
 );
 
 
+export const deleteMessage = createAsyncThunk(
+  'chatting/deleteMessage',
+  async (messageId, { getState, rejectWithValue }) => {
+      try {
+          const { auth: { token } } = getState();
+          if (token) {
+              axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+          }
+          const response = await axiosInstance.delete(`/messages/${messageId}`);
+          return response.data;
+      } catch (error) {
+          return rejectWithValue(error.response.data);
+      }
+  }
+);
+
+
+export const listChattedUsers = createAsyncThunk(
+    'chatting/listChattedUsers',
+    async (_, { getState, rejectWithValue }) => {
+        try {
+            const { auth: { token } } = getState();
+            if (token) {
+                axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+            }
+            const response = await axiosInstance.get('/chatted-users');
+            return response.data.map(user => user.userDetails);  // Extract userDetails from response
+        } catch (error) {
+            return rejectWithValue(error.response.data);
+        }
+    }
+);
+
 const initialState = {
-  users: [],
-  conversations: [],
-  activeChat: null,
-  showUsersList: false,
-  status: 'idle',
-  error: null,
+    users: [],
+    chattedUsers: [],
+    conversations: [],
+    activeChat: null,
+    showAllUsers: false,
+    status: 'idle',
+    error: null,
 };
 
 const chattingSlice = createSlice({
-  name: 'chatting',
-  initialState,
-  reducers: {
-    toggleUsersList(state) {
-      state.showUsersList = !state.showUsersList;
+    name: 'chatting',
+    initialState,
+    reducers: {
+        toggleShowAllUsers(state) {
+            state.showAllUsers = !state.showAllUsers;
+        },
+        setActiveChat(state, action) {
+            state.activeChat = action.payload;
+        },
     },
-    setActiveChat(state, action) {
-      state.activeChat = action.payload;
-    },
-  },
-  extraReducers: (builder) => {
-    builder
-      .addCase(fetchUsers.fulfilled, (state, action) => {
-        state.users = action.payload;
-      })
-      .addCase(fetchConversations.fulfilled, (state, action) => {
-        state.conversations = action.payload;
-      })
-      .addCase(sendMessage.fulfilled, (state, action) => {
-        // Here you might want to update the conversation with the new message
-        state.conversations.push(action.payload);
-      });
-    // You can handle more cases like pending, rejected for each async thunk if needed
-  }
+    extraReducers: (builder) => {
+        builder
+            .addCase(fetchUsers.pending, (state) => {
+                state.status = 'loading';
+            })
+            .addCase(fetchUsers.fulfilled, (state, action) => {
+                state.status = 'succeeded';
+                state.users = action.payload;
+            })
+            .addCase(fetchUsers.rejected, (state, action) => {
+                state.status = 'failed';
+                state.error = action.payload;
+            })
+            .addCase(fetchConversations.pending, (state) => {
+                state.status = 'loading';
+            })
+            .addCase(fetchConversations.fulfilled, (state, action) => {
+                state.status = 'succeeded';
+                console.log('Fetched conversations:', action.payload);
+                state.conversations = action.payload;
+            })
+            .addCase(fetchConversations.rejected, (state, action) => {
+                state.status = 'failed';
+                state.error = action.payload;
+            })
+            .addCase(sendMessage.pending, (state) => {
+                state.status = 'loading';
+            })
+            .addCase(sendMessage.fulfilled, (state, action) => {
+                state.status = 'succeeded';
+                console.log('Sent message:', action.payload);
+                state.conversations.push(action.payload); // Add the new message to the state
+            })
+            .addCase(sendMessage.rejected, (state, action) => {
+                state.status = 'failed';
+                state.error = action.payload;
+            })
+            .addCase(fetchConversationsList.pending, (state) => {
+                state.status = 'loading';
+            })
+            .addCase(fetchConversationsList.fulfilled, (state, action) => {
+                state.status = 'succeeded';
+                state.conversations = action.payload;
+            })
+            .addCase(fetchConversationsList.rejected, (state, action) => {
+                state.status = 'failed';
+                state.error = action.payload;
+            })
+            .addCase(markMessageAsRead.pending, (state) => {
+                state.status = 'loading';
+            })
+            .addCase(markMessageAsRead.fulfilled, (state, action) => {
+                state.status = 'succeeded';
+                const { messageId, userId } = action.payload;
+                const message = state.conversations.find(msg => msg._id === messageId);
+                if (message) {
+                    message.readBy.push(userId);
+                }
+            })
+            .addCase(markMessageAsRead.rejected, (state, action) => {
+                state.status = 'failed';
+                state.error = action.payload;
+            })
+            .addCase(editMessage.pending, (state) => {
+              state.status = 'loading';
+          })
+          .addCase(editMessage.fulfilled, (state, action) => {
+              state.status = 'succeeded';
+              const updatedMessage = action.payload;
+              const index = state.conversations.findIndex(msg => msg._id === updatedMessage._id);
+              if (index !== -1) {
+                  state.conversations[index] = updatedMessage;
+              }
+          })
+          .addCase(editMessage.rejected, (state, action) => {
+              state.status = 'failed';
+              state.error = action.payload;
+          })
+            .addCase(deleteMessage.pending, (state) => {
+                state.status = 'loading';
+            })
+            .addCase(deleteMessage.fulfilled, (state, action) => {
+                state.status = 'succeeded';
+                const messageId = action.payload;
+                state.conversations = state.conversations.filter(msg => msg._id !== messageId);
+            })
+            .addCase(deleteMessage.rejected, (state, action) => {
+                state.status = 'failed';
+                state.error = action.payload;
+            })
+            .addCase(listChattedUsers.pending, (state) => {
+                state.status = 'loading';
+            })
+            .addCase(listChattedUsers.fulfilled, (state, action) => {
+                state.status = 'succeeded';
+                state.chattedUsers = action.payload;
+            })
+            .addCase(listChattedUsers.rejected, (state, action) => {
+                state.status = 'failed';
+                state.error = action.payload;
+            });
+    }
 });
 
-export const { toggleUsersList, setActiveChat } = chattingSlice.actions;
+export const { toggleShowAllUsers, setActiveChat } = chattingSlice.actions;
 
 export default chattingSlice.reducer;

@@ -1,49 +1,73 @@
-// src/store/authSlice.js
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import axios from 'axios';
 
-export const authSlice = createSlice({
-  name: 'auth',
-  initialState: {
+// Initial state for authentication
+const initialState = {
     isAuthenticated: false,
     token: null,
     user: null, // This will store detailed user information
-  },
-  reducers: {
-    // Handles successful login, updating state with user details and token
-    loginSuccess: (state, action) => {
-      const { token, userType, personalDetails, contactInfo, _id } = action.payload;
-      console.log('Login success:', action.payload); // Log the entire payload
-      state.isAuthenticated = true;
-      state.token = token;
-      state.user = {
-        id: _id, // Storing the user ID here
-        userType,
-        personalDetails,
-        contactInfo,
-      };
-      console.log('User ID on login:', _id); // Specifically log the user ID
-    },
-    // Handles user logout, resetting the auth state
-    logout: (state) => {
-      console.log('User logged out. Previous state:', state);
-      state.isAuthenticated = false;
-      state.token = null;
-      state.user = null;
-    },
-    // Handles login failure, updating state accordingly
-    loginFailure: (state, action) => {
-      console.log('Login failure:', action.payload); // Log the failure reason
-      state.isAuthenticated = false;
-      state.token = null;
-      state.user = null;
-    },
-  },
+    status: 'idle',
+    error: null,
+};
+
+// Async thunk for fetching user profile
+export const fetchUser = createAsyncThunk('auth/fetchUser', async (_, { rejectWithValue }) => {
+    try {
+        const response = await axios.get('http://localhost:3000/api/user/profile');
+        return response.data;
+    } catch (error) {
+        return rejectWithValue(error.response.data);
+    }
 });
 
-// Action creators are generated for each case reducer function
+// Slice for authentication
+const authSlice = createSlice({
+    name: 'auth',
+    initialState,
+    reducers: {
+        loginSuccess: (state, action) => {
+            const { token, userType, personalDetails, contactInfo, _id } = action.payload;
+            state.isAuthenticated = true;
+            state.token = token;
+            state.user = {
+                id: _id, // Storing the user ID here
+                userType,
+                personalDetails,
+                contactInfo,
+            };
+        },
+        logout: (state) => {
+            state.isAuthenticated = false;
+            state.token = null;
+            state.user = null;
+        },
+        loginFailure: (state, action) => {
+            state.isAuthenticated = false;
+            state.token = null;
+            state.user = null;
+            state.error = action.payload;
+        },
+    },
+    extraReducers: (builder) => {
+        builder
+            .addCase(fetchUser.pending, (state) => {
+                state.status = 'loading';
+            })
+            .addCase(fetchUser.fulfilled, (state, action) => {
+                state.status = 'succeeded';
+                state.isAuthenticated = true;
+                state.user = action.payload;
+            })
+            .addCase(fetchUser.rejected, (state, action) => {
+                state.status = 'failed';
+                state.error = action.payload;
+            });
+    },
+});
+
 export const { loginSuccess, logout, loginFailure } = authSlice.actions;
 
-// Selectors
+// Selectors to get authentication state
 export const selectAuth = (state) => state.auth.isAuthenticated;
 export const selectUserDetails = (state) => state.auth.user;
 export const selectUserToken = (state) => state.auth.token;

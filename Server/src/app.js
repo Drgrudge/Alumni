@@ -13,6 +13,7 @@ import friendRequestRoutes from './api/routes/friendRequestRoutes.js';
 import jobRoutes from './api/routes/jobRoutes.js';
 import eventRoutes from './api/routes/eventRoutes.js';
 import donationRoutes from './api/routes/donationRoutes.js';
+import groupRoutes from './api/routes/groupRoutes.js';
 import analyticsRoutes from './api/routes/donationAnalyticsRoutes.js';
 import notificationRoutes from './api/routes/NotificationRoutes.js';
 import userDirectoryRoutes from './api/routes/userDirectoryRoutes.js';
@@ -62,6 +63,7 @@ app.use('/api/notifications', notificationRoutes);
 app.use('/api/directory', userDirectoryRoutes);
 app.use('/api', studentUploadRoutes);
 app.use('/api/analytics', analyticsRoutes);
+app.use('/api/groups', groupRoutes);
 // app.use('/api/faculty', facultyRoutes);
 app.use('/uploads', express.static('uploads'));
 
