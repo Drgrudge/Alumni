@@ -31,9 +31,9 @@ const EventListPage = () => {
 
   return (
     <div>
-      <h2 className="text-xl text-center font-bold mb-4">Events</h2>
-      <Link to="/events/create" className="mb-4 inline-block bg-blue-500 text-white p-2 rounded">Create Event</Link>
-      <div className="py-10 grid gap-x-8 gap-y-4 grid-cols-3">
+      <h2 className="text-3xl text-center font-bold mb-4">Events</h2>
+      <Link to="/events/create" className="mb-4 ml-4 inline-block bg-blue-500 text-white p-2 rounded">Create Event</Link>
+      <div className="py-10 ml-4 grid gap-x-8 gap-y-4 grid-cols-3">
         {events.map((event) => (
           <div key={event._id} className="bg-white p-4 rounded shadow-md w-fit">
             <div style={{ height: "200px", width: "300px" }}>

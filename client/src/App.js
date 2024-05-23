@@ -55,7 +55,7 @@ function App() {
         <Navbar />
         {isAuthenticated && (
           <div className="flex flex-col h-full md:flex-row">
-            <SidebarWithContentSeparator className="md:w-1/4" />
+            <SidebarWithContentSeparator className="md:w-1/4 h-full" />
             <div className="flex flex-col mt-15 w-full">
               <div className="w-full h-100vh py-5  px-4">
                 <Routes>

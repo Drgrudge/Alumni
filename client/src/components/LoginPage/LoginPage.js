@@ -3,6 +3,8 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { loginSuccess } from '../../redux/store/authSlice'; // Adjust the import path as necessary
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const LoginPage = () => {
     const [email, setEmail] = useState('');
@@ -12,6 +14,8 @@ const LoginPage = () => {
 
     const handleLogin = async (event) => {
         event.preventDefault();
+        toast.info('Logging in...', { autoClose: 2000 });
+
         try {
             const response = await axios.post('http://localhost:3000/api/users/login', { email, password });
             console.log('Login successful:', response.data);
@@ -29,7 +33,7 @@ const LoginPage = () => {
                 contactInfo: response.data.contactInfo,
                 _id: response.data._id, // Including the user ID
             }));
-              
+
             // Redirect based on user role
             if (response.data.userType === 'admin') {
                 navigate('/dashboard');
@@ -37,13 +41,20 @@ const LoginPage = () => {
                 navigate('/dashboard');
             }
         } catch (error) {
-            console.error('Login failed:', error.response?.data?.message || 'Error occurred');
+            const errorMessage = error.response?.data?.message || 'Error occurred';
+            if (error.response?.status === 401) {
+                toast.error('Incorrect email or password', { autoClose: 3000 });
+            } else {
+                toast.error(errorMessage, { autoClose: 3000 });
+            }
+            console.error('Login failed:', errorMessage);
         }
     };
 
     return (
         <div className="flex min-h-screen bg-gray-100">
             <div className="flex flex-col justify-center w-full max-w-md px-4 mx-auto lg:w-1/2">
+            <ToastContainer />
                 <div className="w-full bg-white p-8 border border-gray-300 rounded-lg shadow-md">
                     <div className="mb-4 text-center">
                         <h1 className="text-3xl text-gray-700">Tezpur University Alumni Connect</h1>

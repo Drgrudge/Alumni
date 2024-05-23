@@ -7,7 +7,8 @@ import axios from 'axios';
 function EditProfilePage() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const { profile, token } = useSelector(state => state.user); // Fetch token from state
+    const { profile } = useSelector(state => state.user);
+    const token = useSelector(state => state.auth.token); // Fetch token from the auth state
     const [formData, setFormData] = useState({
         personalDetails: {
             firstName: '',
@@ -57,14 +58,14 @@ function EditProfilePage() {
             setFormData({
                 ...profile,
                 personalDetails: {
-                    firstName: profile.personalDetails?.firstName || '',
-                    lastName: profile.personalDetails?.lastName || '',
-                    profilePicture: profile.personalDetails?.profilePicture || ''
+                    firstName: profile.personalDetails.firstName || '',
+                    lastName: profile.personalDetails.lastName || '',
+                    profilePicture: profile.personalDetails.profilePicture || ''
                 },
                 contactInfo: {
-                    email: profile.contactInfo?.email || '',
-                    phone: profile.contactInfo?.phone || '',
-                    address: profile.contactInfo?.address || ''
+                    email: profile.contactInfo.email || '',
+                    phone: profile.contactInfo.phone || '',
+                    address: profile.contactInfo.address || ''
                 },
                 educationHistory: profile.educationHistory.length > 0 ? profile.educationHistory : [{
                     institutionName: '',
@@ -83,12 +84,12 @@ function EditProfilePage() {
                     skills: ''
                 }],
                 roleDetails: {
-                    departmentManaged: profile.roleDetails?.departmentManaged || '',
-                    permissions: profile.roleDetails?.permissions || '',
-                    department: profile.roleDetails?.department || '',
-                    title: profile.roleDetails?.title || '',
-                    coursesTaught: profile.roleDetails?.coursesTaught || '',
-                    researchInterests: profile.roleDetails?.researchInterests || ''
+                    departmentManaged: profile.roleDetails.departmentManaged || '',
+                    permissions: profile.roleDetails.permissions || '',
+                    department: profile.roleDetails.department || '',
+                    title: profile.roleDetails.title || '',
+                    coursesTaught: profile.roleDetails.coursesTaught || '',
+                    researchInterests: profile.roleDetails.researchInterests || ''
                 }
             });
         }
@@ -260,212 +261,207 @@ function EditProfilePage() {
                 {/* Education History */}
                 {formData.educationHistory.map((education, index) => (
                     <div key={index} className="mb-4">
-                        <h3 className="text-xl font-semibold mb-2">Education #{index + 1}</h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label className="block mb-2 font-semibold">Institution Name:</label>
-                                <input
-                                    type="text"
-                                    name="institutionName"
-                                    value={education.institutionName}
-                                    onChange={e => handleNestedChange(e, 'educationHistory', index, 'institutionName')}
-                                    className="w-full border rounded-md px-4 py-2 focus:outline-none focus:border-blue-500"
-                                />
-                            </div>
-                            <div>
-                                <label className="block mb-2 font-semibold">Degree:</label>
-                                <input
-                                    type="text"
-                                    name="degree"
-                                    value={education.degree}
-                                    onChange={e => handleNestedChange(e, 'educationHistory', index, 'degree')}
-                                    className="w-full border rounded-md px-4 py-2 focus:outline-none focus:border-blue-500"
-                                />
-                            </div>
-                            <div>
-                                <label className="block mb-2 font-semibold">Department:</label>
-                                <input
-                                    type="text"
-                                    name="department"
-                                    value={education.department}
-                                    onChange={e => handleNestedChange(e, 'educationHistory', index, 'department')}
-                                    className="w-full border rounded-md px-4 py-2 focus:outline-none focus:border-blue-500"
-                                />
-                            </div>
-                            <div>
-                                <label className="block mb-2 font-semibold">Programme:</label>
-                                <input
-                                    type="text"
-                                    name="programme"
-                                    value={education.programme}
-                                    onChange={e => handleNestedChange(e, 'educationHistory', index, 'programme')}
-                                    className="w-full border rounded-md px-4 py-2 focus:outline-none focus:border-blue-500"
-                                />
-                            </div>
-                            <div>
-                                <label className="block mb-2 font-semibold">Year Of Graduation:</label>
-                                <input
-                                    type="text"
-                                    name="yearOfGraduation"
-                                    value={education.yearOfGraduation}
-                                    onChange={e => handleNestedChange(e, 'educationHistory', index, 'yearOfGraduation')}
-                                    className="w-full border rounded-md px-4 py-2 focus:outline-none focus:border-blue-500"
-                                />
-                            </div>
-                            <div>
-                                <label className="block mb-2 font-semibold">Activities:</label>
-                                <input
-                                    type="text"
-                                    name="activities"
-                                    value={education.activities}
-                                    onChange={e => handleNestedChange(e, 'educationHistory', index, 'activities')}
-                                    className="w-full border rounded-md px-4 py-2 focus:outline-none focus:border-blue-500"
-                                />
-                            </div>
+                        <h3 className="font-semibold mb-2">Education History {index + 1}</h3>
+                        <div>
+                            <label className="block mb-2 font-semibold">Institution Name:</label>
+                            <input
+                                type="text"
+                                name="institutionName"
+                                value={education.institutionName || ''}
+                                onChange={e => handleNestedChange(e, 'educationHistory', index, 'institutionName')}
+                                className="w-full border rounded-md px-4 py-2 focus:outline-none focus:border-blue-500"
+                            />
+                        </div>
+                        <div>
+                            <label className="block mb-2 font-semibold">Degree:</label>
+                            <input
+                                type="text"
+                                name="degree"
+                                value={education.degree || ''}
+                                onChange={e => handleNestedChange(e, 'educationHistory', index, 'degree')}
+                                className="w-full border rounded-md px-4 py-2 focus:outline-none focus:border-blue-500"
+                            />
+                        </div>
+                        <div>
+                            <label className="block mb-2 font-semibold">Department:</label>
+                            <input
+                                type="text"
+                                name="department"
+                                value={education.department || ''}
+                                onChange={e => handleNestedChange(e, 'educationHistory', index, 'department')}
+                                className="w-full border rounded-md px-4 py-2 focus:outline-none focus:border-blue-500"
+                            />
+                        </div>
+                        <div>
+                            <label className="block mb-2 font-semibold">Programme:</label>
+                            <input
+                                type="text"
+                                name="programme"
+                                value={education.programme || ''}
+                                onChange={e => handleNestedChange(e, 'educationHistory', index, 'programme')}
+                                className="w-full border rounded-md px-4 py-2 focus:outline-none focus:border-blue-500"
+                            />
+                        </div>
+                        <div>
+                            <label className="block mb-2 font-semibold">Year of Graduation:</label>
+                            <input
+                                type="text"
+                                name="yearOfGraduation"
+                                value={education.yearOfGraduation || ''}
+                                onChange={e => handleNestedChange(e, 'educationHistory', index, 'yearOfGraduation')}
+                                className="w-full border rounded-md px-4 py-2 focus:outline-none focus:border-blue-500"
+                            />
+                        </div>
+                        <div>
+                            <label className="block mb-2 font-semibold">Activities:</label>
+                            <input
+                                type="text"
+                                name="activities"
+                                value={education.activities || ''}
+                                onChange={e => handleNestedChange(e, 'educationHistory', index, 'activities')}
+                                className="w-full border rounded-md px-4 py-2 focus:outline-none focus:border-blue-500"
+                            />
                         </div>
                     </div>
                 ))}
-                {/* Additional education history fields can be added here */}
 
                 {/* Work Experience */}
                 {formData.workExperience.map((work, index) => (
                     <div key={index} className="mb-4">
-                        <h3 className="text-xl font-semibold mb-2">Work Experience #{index + 1}</h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label className="block mb-2 font-semibold">Company Name:</label>
-                                <input
-                                    type="text"
-                                    name="companyName"
-                                    value={work.companyName}
-                                    onChange={e => handleNestedChange(e, 'workExperience', index, 'companyName')}
-                                    className="w-full border rounded-md px-4 py-2 focus:outline-none focus:border-blue-500"
-                                />
-                            </div>
-                            <div>
-                                <label className="block mb-2 font-semibold">Position:</label>
-                                <input
-                                    type="text"
-                                    name="position"
-                                    value={work.position}
-                                    onChange={e => handleNestedChange(e, 'workExperience', index, 'position')}
-                                    className="w-full border rounded-md px-4 py-2 focus:outline-none focus:border-blue-500"
-                                />
-                            </div>
-                            <div>
-                                <label className="block mb-2 font-semibold">Start Date:</label>
-                                <input
-                                    type="text"
-                                    name="startDate"
-                                    value={work.startDate}
-                                    onChange={e => handleNestedChange(e, 'workExperience', index, 'startDate')}
-                                    className="w-full border rounded-md px-4 py-2 focus:outline-none focus:border-blue-500"
-                                />
-                            </div>
-                            <div>
-                                <label className="block mb-2 font-semibold">End Date:</label>
-                                <input
-                                    type="text"
-                                    name="endDate"
-                                    value={work.endDate}
-                                    onChange={e => handleNestedChange(e, 'workExperience', index, 'endDate')}
-                                    className="w-full border rounded-md px-4 py-2 focus:outline-none focus:border-blue-500"
-                                />
-                            </div>
-                            <div>
-                                <label className="block mb-2 font-semibold">Description:</label>
-                                <input
-                                    type="text"
-                                    name="description"
-                                    value={work.description}
-                                    onChange={e => handleNestedChange(e, 'workExperience', index, 'description')}
-                                    className="w-full border rounded-md px-4 py-2 focus:outline-none focus:border-blue-500"
-                                />
-                            </div>
-                            <div>
-                                <label className="block mb-2 font-semibold">Skills:</label>
-                                <input
-                                    type="text"
-                                    name="skills"
-                                    value={work.skills}
-                                    onChange={e => handleNestedChange(e, 'workExperience', index, 'skills')}
-                                    className="w-full border rounded-md px-4 py-2 focus:outline-none focus:border-blue-500"
-                                />
-                            </div>
+                        <h3 className="font-semibold mb-2">Work Experience {index + 1}</h3>
+                        <div>
+                            <label className="block mb-2 font-semibold">Company Name:</label>
+                            <input
+                                type="text"
+                                name="companyName"
+                                value={work.companyName || ''}
+                                onChange={e => handleNestedChange(e, 'workExperience', index, 'companyName')}
+                                className="w-full border rounded-md px-4 py-2 focus:outline-none focus:border-blue-500"
+                            />
+                        </div>
+                        <div>
+                            <label className="block mb-2 font-semibold">Position:</label>
+                            <input
+                                type="text"
+                                name="position"
+                                value={work.position || ''}
+                                onChange={e => handleNestedChange(e, 'workExperience', index, 'position')}
+                                className="w-full border rounded-md px-4 py-2 focus:outline-none focus:border-blue-500"
+                            />
+                        </div>
+                        <div>
+                            <label className="block mb-2 font-semibold">Start Date:</label>
+                            <input
+                                type="date"
+                                name="startDate"
+                                value={work.startDate || ''}
+                                onChange={e => handleNestedChange(e, 'workExperience', index, 'startDate')}
+                                className="w-full border rounded-md px-4 py-2 focus:outline-none focus:border-blue-500"
+                            />
+                        </div>
+                        <div>
+                            <label className="block mb-2 font-semibold">End Date:</label>
+                            <input
+                                type="date"
+                                name="endDate"
+                                value={work.endDate || ''}
+                                onChange={e => handleNestedChange(e, 'workExperience', index, 'endDate')}
+                                className="w-full border rounded-md px-4 py-2 focus:outline-none focus:border-blue-500"
+                            />
+                        </div>
+                        <div>
+                            <label className="block mb-2 font-semibold">Description:</label>
+                            <textarea
+                                name="description"
+                                value={work.description || ''}
+                                onChange={e => handleNestedChange(e, 'workExperience', index, 'description')}
+                                className="w-full border rounded-md px-4 py-2 focus:outline-none focus:border-blue-500"
+                            />
+                        </div>
+                        <div>
+                            <label className="block mb-2 font-semibold">Skills:</label>
+                            <input
+                                type="text"
+                                name="skills"
+                                value={work.skills || ''}
+                                onChange={e => handleNestedChange(e, 'workExperience', index, 'skills')}
+                                className="w-full border rounded-md px-4 py-2 focus:outline-none focus:border-blue-500"
+                            />
                         </div>
                     </div>
                 ))}
-                {/* Additional work experience fields can be added here */}
 
                 {/* Role Details */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {formData.userType === 'admin' && (
                     <div>
                         <label className="block mb-2 font-semibold">Department Managed:</label>
                         <input
                             type="text"
                             name="departmentManaged"
-                            value={formData.roleDetails.departmentManaged}
+                            value={formData.roleDetails.departmentManaged || ''}
                             onChange={e => handleChange(e, 'roleDetails')}
                             className="w-full border rounded-md px-4 py-2 focus:outline-none focus:border-blue-500"
                         />
-                    </div>
-                    <div>
                         <label className="block mb-2 font-semibold">Permissions:</label>
                         <input
                             type="text"
                             name="permissions"
-                            value={formData.roleDetails.permissions}
+                            value={formData.roleDetails.permissions || ''}
                             onChange={e => handleChange(e, 'roleDetails')}
                             className="w-full border rounded-md px-4 py-2 focus:outline-none focus:border-blue-500"
                         />
                     </div>
-                    <div>
-                        <label className="block mb-2 font-semibold">Department:</label>
-                        <input
-                            type="text"
-                            name="department"
-                            value={formData.roleDetails.department}
-                            onChange={e => handleChange(e, 'roleDetails')}
-                            className="w-full border rounded-md px-4 py-2 focus:outline-none focus:border-blue-500"
-                        />
-                    </div>
-                    <div>
-                        <label className="block mb-2 font-semibold">Title:</label>
-                        <input
-                            type="text"
-                            name="title"
-                            value={formData.roleDetails.title}
-                            onChange={e => handleChange(e, 'roleDetails')}
-                            className="w-full border rounded-md px-4 py-2 focus:outline-none focus:border-blue-500"
-                        />
-                    </div>
-                    <div>
-                        <label className="block mb-2 font-semibold">Courses Taught:</label>
-                        <input
-                            type="text"
-                            name="coursesTaught"
-                            value={formData.roleDetails.coursesTaught}
-                            onChange={e => handleChange(e, 'roleDetails')}
-                            className="w-full border rounded-md px-4 py-2 focus:outline-none focus:border-blue-500"
-                        />
-                    </div>
-                    <div>
-                        <label className="block mb-2 font-semibold">Research Interests:</label>
-                        <input
-                            type="text"
-                            name="researchInterests"
-                            value={formData.roleDetails.researchInterests}
-                            onChange={e => handleChange(e, 'roleDetails')}
-                            className="w-full border rounded-md px-4 py-2 focus:outline-none focus:border-blue-500"
-                        />
-                    </div>
-                </div>
+                )}
+                {formData.userType === 'faculty' && (
+                    <>
+                        <div>
+                            <label className="block mb-2 font-semibold">Department:</label>
+                            <input
+                                type="text"
+                                name="department"
+                                value={formData.roleDetails.department || ''}
+                                onChange={e => handleChange(e, 'roleDetails')}
+                                className="w-full border rounded-md px-4 py-2 focus:outline-none focus:border-blue-500"
+                            />
+                        </div>
+                        <div>
+                            <label className="block mb-2 font-semibold">Title:</label>
+                            <input
+                                type="text"
+                                name="title"
+                                value={formData.roleDetails.title || ''}
+                                onChange={e => handleChange(e, 'roleDetails')}
+                                className="w-full border rounded-md px-4 py-2 focus:outline-none focus:border-blue-500"
+                            />
+                        </div>
+                        <div>
+                            <label className="block mb-2 font-semibold">Courses Taught:</label>
+                            <input
+                                type="text"
+                                name="coursesTaught"
+                                value={formData.roleDetails.coursesTaught || ''}
+                                onChange={e => handleChange(e, 'roleDetails')}
+                                className="w-full border rounded-md px-4 py-2 focus:outline-none focus:border-blue-500"
+                            />
+                        </div>
+                        <div>
+                            <label className="block mb-2 font-semibold">Research Interests:</label>
+                            <input
+                                type="text"
+                                name="researchInterests"
+                                value={formData.roleDetails.researchInterests || ''}
+                                onChange={e => handleChange(e, 'roleDetails')}
+                                className="w-full border rounded-md px-4 py-2 focus:outline-none focus:border-blue-500"
+                            />
+                        </div>
+                    </>
+                )}
 
                 <button
                     type="submit"
-                    className="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600"
+                    className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-md focus:outline-none focus:bg-blue-600 transition duration-300"
                 >
-                    Save Changes
+                    Update Profile
                 </button>
             </form>
         </div>

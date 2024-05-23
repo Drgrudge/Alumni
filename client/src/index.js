@@ -6,6 +6,7 @@ import reportWebVitals from './reportWebVitals';
 import { Provider } from 'react-redux';
 import { store } from './redux/store/store'; // Adjust this path if necessary
 import { loginSuccess } from './redux/store/authSlice'; // Import the action creator for setting the auth state
+import { ToastContainer } from 'react-toastify';
 
 // Attempt to retrieve the token from localStorage
 const authToken = localStorage.getItem('authToken');
@@ -23,6 +24,7 @@ root.render(
   <React.StrictMode>
     <Provider store={store}>
       <App />
+    <ToastContainer/>
     </Provider>
   </React.StrictMode>
 );

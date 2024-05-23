@@ -39,7 +39,7 @@ const UserProfileSummary = () => {
               <img
                 role="img"
                 className="w-full h-full overflow-hidden object-cover rounded-full"
-                src="https://tuk-cdn.s3.amazonaws.com/assets/components/grid_cards/gc_2.png"
+                src=""
                 alt="avatar"
               />
             </div>

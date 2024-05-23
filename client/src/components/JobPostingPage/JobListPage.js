@@ -23,12 +23,12 @@ const JobListPage = () => {
   if (error) return <div className="text-red-500 text-center py-5">Error: {error}</div>;
 
   return (
-    <div>
-      <h2 className="text-xl text-center font-bold mb-4">Job Listings</h2>
+    <div >
+      <h2 className="text-3xl text-center font-bold mb-4">Job Listings</h2>
       {auth.isAuthenticated && (
-        <Link to="/jobs/create" className="mb-4 inline-block bg-blue-500 text-white p-2 rounded">Create Job</Link>
+        <Link to="/jobs/create" className="mb-4 ml-4 inline-block bg-blue-500 text-white p-2 rounded">Create Job</Link>
       )}
-      <div className="py-10 grid gap-x-8 gap-y-4 grid-cols-3">
+      <div className="py-10 ml-4 grid gap-x-8 gap-y-4 grid-cols-3">
         {jobs.map((job) => (
           <div key={job._id} className="bg-white p-4 rounded shadow-md w-fit">
             <div style={{ height: "200px", width: "300px" }}>
