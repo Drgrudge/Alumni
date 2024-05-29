@@ -8,6 +8,7 @@ function Sidebar({ currentUser }) {
     const chattedUsers = useSelector(state => state.chatting.chattedUsers);
     const showAllUsers = useSelector(state => state.chatting.showAllUsers);
     const [searchTerm, setSearchTerm] = useState('');
+    const { profile: userProfile, error, status } = useSelector((state) => state.user);
 
     useEffect(() => {
         dispatch(listChattedUsers()).then(response => {
@@ -32,17 +33,17 @@ function Sidebar({ currentUser }) {
     );
 
     return (
-        <div className="w-1/4 bg-gray-100 p-4 border-r border-gray-200 flex flex-col">
+        <div className="w-1/4 bg-gray-800 p-2 border-r border-gray-200 flex flex-col">
             {/* Current User Profile */}
-            <div className="flex items-center p-4 mb-4 bg-white shadow rounded">
-                <img src={currentUser?.personalDetails?.profilePicture} alt={currentUser?.personalDetails?.firstName} className="w-12 h-12 rounded-full mr-4" />
+            <div className="flex items-center p-4 mb-4 bg-gray-500 shadow rounded">
+                <img src={`http://localhost:3000${userProfile.personalDetails.profilePicture}` || 'default-avatar.png'} alt="avatar" className="w-12 border-2 border-gray-700 h-12 rounded-full mr-4" />
                 <div>
                     <div className="text-lg font-bold">{currentUser?.personalDetails?.firstName} {currentUser?.personalDetails?.lastName}</div>
-                    <div className="text-sm text-gray-500">My Profile</div>
+                    <div className="text-sm text-white">My Profile</div>
                 </div>
             </div>
 
-            <h2 className="text-xl font-bold mb-4">Chats</h2>
+            <h2 className="text-xl text-white font-bold mb-4">Chats</h2>
             <input
                 type="text"
                 value={searchTerm}
@@ -56,15 +57,15 @@ function Sidebar({ currentUser }) {
             >
                 {showAllUsers ? 'Show Chatted Users' : 'Show All Users'}
             </button>
-            <ul className="flex-grow overflow-y-auto">
+            <ul className="flex-grow  overflow-y-auto">
                 {filteredUsers.map(user => (
                     user?._id !== currentUser?._id && (
                         <li
                             key={user?._id}
-                            className="flex items-center p-2 cursor-pointer hover:bg-gray-200"
+                            className="flex items-center p-2 pb-2 text-white cursor-pointer border-b hover:bg-slate-600  border-gray-700"
                             onClick={() => handleUserClick(user)}
                         >
-                            <img src={user?.personalDetails?.profilePicture} alt={user?.personalDetails?.firstName} className="w-10 h-10 rounded-full mr-2" />
+                            <img src={user?.personalDetails?.profilePicture} alt={user?.personalDetails?.firstName} className="w-10 border-2  border-gray-700 h-10 rounded-full mr-2" />
                             <div>
                                 <div className="font-bold">{user?.personalDetails?.firstName} {user?.personalDetails?.lastName}</div>
                             </div>

@@ -22,8 +22,12 @@ const NotificationController = {
     },
 
     createNotification: async (userId, type, message, link) => {
-        const newNotification = new Notification({ userId, type, message, link });
-        await newNotification.save();
+        try {
+            const newNotification = new Notification({ userId, type, message, link });
+            await newNotification.save();
+        } catch (error) {
+            console.error('Error creating notification:', error);
+        }
     }
 };
 

@@ -22,7 +22,7 @@ const ChatPage = () => {
     console.log('Current user:', currentUser);
 
     return (
-        <div className="flex h-screen my-4 border-2 border-sky-700">
+        <div className="flex h-screen my-4 border-2 rounded-lg border-sky-700">
             <Sidebar 
                 currentUser={currentUser} 
             />

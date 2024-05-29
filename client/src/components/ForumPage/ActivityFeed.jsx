@@ -2,8 +2,8 @@ import React from 'react'
 
 const ActivityFeed = () => {
   return (
-    <div className="py-8 overflow-hidden relative">
-          <div className="max-w-sm animate-scroll bg-white shadow rounded p-6">
+    <div className="py-8 overflow-hidden border-2 border-gray-500 rounded-xl relative">
+          <div className="max-w-sm  bg-white  p-6">
             <div className="flex items-end">
               <p
                 tabIndex="0"

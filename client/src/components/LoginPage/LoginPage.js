@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, NavLink } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { loginSuccess } from '../../redux/store/authSlice'; // Adjust the import path as necessary
 import { ToastContainer, toast } from 'react-toastify';
@@ -35,11 +35,7 @@ const LoginPage = () => {
             }));
 
             // Redirect based on user role
-            if (response.data.userType === 'admin') {
-                navigate('/dashboard');
-            } else {
-                navigate('/dashboard');
-            }
+            navigate('/dashboard');
         } catch (error) {
             const errorMessage = error.response?.data?.message || 'Error occurred';
             if (error.response?.status === 401) {
@@ -54,7 +50,7 @@ const LoginPage = () => {
     return (
         <div className="flex min-h-screen bg-gray-100">
             <div className="flex flex-col justify-center w-full max-w-md px-4 mx-auto lg:w-1/2">
-            <ToastContainer />
+                <ToastContainer />
                 <div className="w-full bg-white p-8 border border-gray-300 rounded-lg shadow-md">
                     <div className="mb-4 text-center">
                         <h1 className="text-3xl text-gray-700">Tezpur University Alumni Connect</h1>
@@ -90,12 +86,12 @@ const LoginPage = () => {
                         </button>
                     </form>
 
-                    <div className="text-center">
-                        <a href="#" className="text-sm text-indigo-600 hover:underline">Forgot password?</a>
+                    <div className="text-center mt-4">
+                        <NavLink to="/request-reset-password" className="text-sm text-indigo-600 hover:underline">Forgot password?</NavLink>
                     </div>
 
-                    <div className="text-center">
-                        <a href="#" className="text-sm text-indigo-600 hover:underline">Don't have an account? Register</a>
+                    <div className="text-center mt-2">
+                        <NavLink to="/register" className="text-sm text-indigo-600 hover:underline">Don't have an account? Register</NavLink>
                     </div>
                 </div>
             </div>
@@ -104,7 +100,7 @@ const LoginPage = () => {
                     <div className="m-auto text-center text-white p-8">
                         <h1 className="text-3xl font-bold mb-2">We are more than just a company</h1>
                         <p className="text-lg">
-                            
+                            Connect, share, and grow with the Tezpur University Alumni Connect.
                         </p>
                     </div>
                 </div>

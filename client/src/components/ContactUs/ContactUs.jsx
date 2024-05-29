@@ -3,14 +3,14 @@ import React from 'react';
 const ContactUs = () => {
   return (
 
-      <div className="flex flex-row border-2 rounded-lg w-full">
+      <div className="flex flex-row border-2 border-gray-700 rounded-lg w-full">
         <div className="w-3/4 bg-indigo-400 h-full pt-5 pb-5 ">
           <form id="contact" className=" bg-indigo-500 py-4 px-8">
-            <h1 className="text-4xl  text-white font-extrabold mb-6">Enter Details</h1>
+            <h1 className="text-4xl  text-black font-extrabold mb-6">Enter Details</h1>
             <div className="block  w-full  mb-6">
               <div className="w-2/4  mb-6">
                 <div className="flex flex-col">
-                  <label htmlFor="full_name" className="text-white text-sm font-semibold leading-tight tracking-normal mb-2">
+                  <label htmlFor="full_name" className="text-black text-sm font-semibold leading-tight tracking-normal mb-2">
                     Full Name
                   </label>
                   <input
@@ -26,7 +26,7 @@ const ContactUs = () => {
               </div>
               <div className="w-2/4 ">
                 <div className="flex flex-col">
-                  <label htmlFor="email" className="text-gray-800 dark:text-white text-sm font-semibold leading-tight tracking-normal mb-2">
+                  <label htmlFor="email" className="text-gray-800  text-sm font-semibold leading-tight tracking-normal mb-2">
                     Email
                   </label>
                   <input
@@ -44,7 +44,7 @@ const ContactUs = () => {
             <div className="flex w-full flex-wrap">
               <div className="w-2/4 max-w-xs">
                 <div className="flex flex-col">
-                  <label htmlFor="phone" className="text-gray-800 dark:text-white text-sm font-semibold leading-tight tracking-normal mb-2">
+                  <label htmlFor="phone" className="text-gray-800 text-sm font-semibold leading-tight tracking-normal mb-2">
                     Phone
                   </label>
                   <input
@@ -61,7 +61,7 @@ const ContactUs = () => {
             </div>
             <div className="w-full mt-6">
               <div className="flex flex-col">
-                <label className="text-sm font-semibold text-gray-800 dark:text-white mb-2" htmlFor="message">
+                <label className="text-sm font-semibold text-gray-800  mb-2" htmlFor="message">
                   Message
                 </label>
                 <textarea

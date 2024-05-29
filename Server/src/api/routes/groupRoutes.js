@@ -1,7 +1,7 @@
 // routes/groupRoutes.js
 import express from 'express';
 import authenticate from '../../middleware/authenticate.js';
-import GroupController from '../controllers/GroupController.js';
+import GroupController from '../controllers/groupController.js';
 
 const router = express.Router();
 

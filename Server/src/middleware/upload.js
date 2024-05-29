@@ -4,7 +4,15 @@ import path from 'path';
 
 // Set storage engine
 const storage = multer.diskStorage({
-  destination: './uploads/images',
+  destination: (req, file, cb) => {
+    if (file.mimetype.startsWith('image/')) {
+      cb(null, './uploads/images');
+    } else if (file.mimetype.startsWith('video/')) {
+      cb(null, './uploads/videos');
+    } else {
+      cb(new Error('Invalid file type'), false);
+    }
+  },
   filename: (req, file, cb) => {
     cb(null, `${file.fieldname}-${Date.now()}${path.extname(file.originalname)}`);
   }
@@ -12,24 +20,24 @@ const storage = multer.diskStorage({
 
 // Check file type
 function checkFileType(file, cb) {
-  const filetypes = /jpeg|jpg|png|gif/;
+  const filetypes = /jpeg|jpg|png|gif|mp4|mpeg/;
   const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
   const mimetype = filetypes.test(file.mimetype);
 
   if (mimetype && extname) {
     return cb(null, true);
   } else {
-    cb('Error: Images Only!');
+    cb('Error: Invalid file type. Only JPG, PNG, GIF, MP4, and MPEG are allowed.');
   }
 }
 
 // Init upload
 const upload = multer({
   storage: storage,
-  limits: { fileSize: 1000000 }, // 1MB limit
+  limits: { fileSize: 50000000 }, // 50MB limit
   fileFilter: (req, file, cb) => {
     checkFileType(file, cb);
   }
-}).single('image');
+}).single('file');
 
 export default upload;

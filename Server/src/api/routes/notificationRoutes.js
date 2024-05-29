@@ -3,7 +3,7 @@ import NotificationController from '../controllers/NotificationController.js'; /
 
 const router = express.Router();
 
-router.get('/user/:userId', NotificationController.getUserNotifications);
-router.put('/mark-read/:notificationId', NotificationController.markNotificationAsRead);
+router.get('/:userId', NotificationController.getUserNotifications);
+router.put('/:notificationId/read', NotificationController.markNotificationAsRead);
 
 export default router;

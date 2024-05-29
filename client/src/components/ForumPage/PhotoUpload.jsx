@@ -16,10 +16,10 @@ const PhotoUpload = ({ onPhotoChange }) => {
     };
 
     return (
-        <div className="photo-upload mb-4">
+        <div className="photo-upload  mb-4">
             {photo && (
-                <div className="photo-preview mb-4 w-40 h-40 overflow-hidden">
-                    <img src={photo} alt="Selected" className="w-full h-full object-cover rounded" />
+                <div className="photo-preview mb-4 w-full h-40 overflow-hidden">
+                    <img src={photo} alt="Selected" className="w-full border-2 h-full object-cover rounded" />
                 </div>
             )}
             <input type="file" accept="image/*" onChange={handlePhotoChange} className="hidden" id="photo-upload-input" />
@@ -27,7 +27,7 @@ const PhotoUpload = ({ onPhotoChange }) => {
                 htmlFor="photo-upload-input"
                 className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded cursor-pointer"
             >
-                Attach Photo
+                Post Photo
             </label>
         </div>
     );

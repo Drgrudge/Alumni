@@ -12,7 +12,7 @@ import DashboardPage from './components/DashboardPage/DashboardPage';
 import ForumPage from './components/ForumPage/ForumPage';
 import LogoutPage from './components/LogOutPage/LogOutPage';
 import Signup from './components/Signup/Signup';
-import UploadStudentsPage from './components/UploadStudentsPage/UploadStudentsPage';
+import UploadPage from './components/UploadUserPage/UploadPage';
 //import ChatPage from './components/ChatPage/ChatPage';
 import DonationPage from './components/DonationPage/DonationPage';
 // import MakeDonationPage from './components/DonationPage/MakeDonationPage';
@@ -38,6 +38,8 @@ import UserProfilePage from './components/ProfilePage/UserProfilePage';
 import UserDirectoryPage from './components/UserDirectoryPage/UserDirectoryPage';
 import UserDirectoryProfilePage from './components/UserDirectoryPage/UserProfilePage';
 
+import PreUserPage from './components/PreUserPage/PreUserPage';
+
 import ChatPage from './components/ChatPage/ChatPage'; // Adjust path based on your structure
 import MakeDonationPage from './components/DonationPage/MakeDonationPage';
 import DonationAnalyticsComponent from './components/DonationPage/donationAnalytics';
@@ -45,6 +47,17 @@ import DonationHistory from './components/DonationPage/DonationHistory';
 import AboutUs from './components/AboutPage/AboutPage';
 import ContactUs from './components/ContactUs/ContactUs';
 
+import AdminForm from './components/PreUserPage/AdminForm';
+import AlumniForm from './components/PreUserPage/AlumniForm';
+import FacultyForm from './components/PreUserPage/FacultyForm';
+import StudentForm from './components/PreUserPage/StudentForm';
+
+import RequestPasswordResetPage from './components/PasswordResetPage/RequestPasswordResetPage';
+import PasswordResetPage from './components/PasswordResetPage/PasswordResetPage';
+
+import NotificationsComponent from './components/NotificationPage/NotificationComponent';
+
+import PostDetailsPage from './components/ForumPage/PostDetailsPage';
 
 function App() {
   const isAuthenticated = useSelector(state => state.auth.isAuthenticated);
@@ -67,7 +80,7 @@ function App() {
                   <Route path="/make-donation" element={<MakeDonationPage />} />
                   <Route path="/donation-analytics" element={<DonationAnalyticsComponent />} />
                   <Route path="/donation-history" element={<DonationHistory />} />
-                  <Route path="/upload-students" element={<UploadStudentsPage />} />
+                  <Route path="/upload-students" element={<UploadPage />} />
                   <Route path="/about-us" element={<AboutUs />} />
                   <Route path="/contact-us" element={<ContactUs />} />
                   {/* Protected Job Routes */}
@@ -93,7 +106,18 @@ function App() {
                   <Route path="/user-directory" element={<UserDirectoryPage />} />
                   <Route path="/user-directory/profile/:userId" element={<UserDirectoryProfilePage />} />
 
+                  <Route path="/preuser" element={<PreUserPage/>} />
+
                   <Route path="/messages" element={<ChatPage />} />
+
+                  <Route path="/create-admins" element={<AdminForm />} />
+                  <Route path="/create-alumni" element={<AlumniForm />} />
+                  <Route path="/create-faculty" element={<FacultyForm />} />
+                  <Route path="/create-students" element={<StudentForm />} />
+
+                  <Route path="/notifications" element={<NotificationsComponent />} />
+
+                  <Route path="/posts/:postId" element={<PostDetailsPage />} />
 
                   
 
@@ -110,6 +134,8 @@ function App() {
           {/* Conditional rendering based on authentication state */}
           <Route path="/login" element={!isAuthenticated ? <LoginPage /> : <Navigate to="/dashboard" />} />
           <Route path="/register" element={!isAuthenticated ? <RegisterPage /> : <Navigate to="/dashboard" />} />
+          <Route path="/request-reset-password" element={<RequestPasswordResetPage />} />
+          <Route path="/reset-password/:token" element={<PasswordResetPage />} />
         </Routes>
         <Footer />
       </div>

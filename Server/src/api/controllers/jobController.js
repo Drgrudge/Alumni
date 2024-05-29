@@ -1,4 +1,3 @@
-// controllers/jobController.js
 import Job from '../models/Job.js';
 import User from '../models/User.js';
 import NotificationController from './NotificationController.js';
@@ -8,7 +7,6 @@ const jobController = {
         try {
             const { title, description, location, company, type, applyLink, author, lastDateToApply, imageUrl } = req.body;
 
-            // Check if an image file was uploaded
             let image = imageUrl;
             if (req.file) {
                 image = `/uploads/images/${req.file.filename}`;
@@ -17,7 +15,6 @@ const jobController = {
             const newJob = new Job({ title, description, location, company, type, applyLink, author, lastDateToApply, image });
             await newJob.save();
 
-            // Notify users about the new job posting
             const users = await User.find({});
             users.forEach(user => {
                 NotificationController.createNotification(
@@ -60,7 +57,6 @@ const jobController = {
             const { imageUrl } = req.body;
             const updatedJobData = { ...req.body };
 
-            // Check if an image file was uploaded
             if (req.file) {
                 updatedJobData.image = `/uploads/images/${req.file.filename}`;
             } else if (imageUrl) {
@@ -72,7 +68,6 @@ const jobController = {
                 return res.status(404).json({ message: 'Job not found' });
             }
 
-            // Notify users about the job update
             const users = await User.find({});
             users.forEach(user => {
                 NotificationController.createNotification(

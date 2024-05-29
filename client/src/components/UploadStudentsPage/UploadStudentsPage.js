@@ -3,7 +3,7 @@ import FileUpload from './FileUpload'; // Import the FileUpload component you cr
 
 function UploadStudentsPage() {
   return (
-    <div className=' mb-8'>
+    <div className=' mb-8 border-2'>
       <h2 className='text-center block'>Upload Students CSV</h2>
       <FileUpload />
     </div>

@@ -1,4 +1,3 @@
-// controllers/eventController.js
 import Event from '../models/Event.js';
 import User from '../models/User.js';
 import NotificationController from './NotificationController.js';

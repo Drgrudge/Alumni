@@ -7,6 +7,12 @@ import userReducer from './userSlice';
 import chattingReducer from './chattingSlice';
 import donationReducer from './donationSlice'; // Import the donation slice
 import donationAnalyticsReducer from './donationAnalyticsSlice'; 
+import userDirectoryReducer from './userDirectorySlice';
+import uploadReducer from './uploadSlice';
+import preUserReducer from './preUserSlice'
+import passwordResetReducer from './passwordResetSlice';
+import statsReducer from "./statsSlice";
+import notificationReducer from './notificationSlice';
 
 export const store = configureStore({
   reducer: {
@@ -18,5 +24,11 @@ export const store = configureStore({
     chatting: chattingReducer,
     donations: donationReducer, // Add the donation slice here
     donationAnalytics: donationAnalyticsReducer,
+    userDirectory: userDirectoryReducer,
+    upload: uploadReducer,
+    preUser: preUserReducer,
+    passwordReset: passwordResetReducer,
+    stats: statsReducer,
+    notifications: notificationReducer,
   },
 });

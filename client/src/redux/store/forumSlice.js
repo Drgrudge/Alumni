@@ -13,6 +13,28 @@ const setAuthToken = (token) => {
   }
 };
 
+axiosInstance.interceptors.request.use(
+  config => {
+    console.log('Request:', config); // Log request
+    return config;
+  },
+  error => {
+    console.error('Request error:', error);
+    return Promise.reject(error);
+  }
+);
+
+axiosInstance.interceptors.response.use(
+  response => {
+    console.log('Response:', response); // Log response
+    return response;
+  },
+  error => {
+    console.error('Response error:', error.response?.data || error.message);
+    return Promise.reject(error);
+  }
+);
+
 export const fetchPosts = createAsyncThunk(
   'forum/fetchPosts',
   async (_, { getState, rejectWithValue }) => {
@@ -41,7 +63,10 @@ export const createPost = createAsyncThunk(
   }
 );
 
-// Async thunk for creating a comment
+export const socketNewPost = (post) => (dispatch) => {
+  dispatch(addPost(post));
+};
+
 export const createComment = createAsyncThunk(
   'forum/createComment',
   async ({ postId, content }, { getState, rejectWithValue }) => {
@@ -52,6 +77,95 @@ export const createComment = createAsyncThunk(
       return { postId, comment: response.data };
     } catch (error) {
       return rejectWithValue(error.response.data.message || 'Could not add comment');
+    }
+  }
+);
+
+export const replyToComment = createAsyncThunk(
+  'forum/replyToComment',
+  async ({ postId, commentId, content }, { getState, rejectWithValue }) => {
+    try {
+      const { auth: { token } } = getState();
+      setAuthToken(token);
+      const response = await axiosInstance.post(`/post/${postId}/comment/${commentId}/reply`, { content });
+      return { postId, commentId, reply: response.data };
+    } catch (error) {
+      return rejectWithValue(error.response.data.message || 'Could not reply to comment');
+    }
+  }
+);
+
+export const editPost = createAsyncThunk(
+  'forum/editPost',
+  async ({ postId, content }, { getState, rejectWithValue }) => {
+    try {
+      const { auth: { token } } = getState();
+      setAuthToken(token);
+      const response = await axiosInstance.put(`/post/${postId}`, { content });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response.data.message || 'Could not edit post');
+    }
+  }
+);
+
+export const deletePost = createAsyncThunk(
+  'forum/deletePost',
+  async (postId, { getState, rejectWithValue }) => {
+    try {
+      const { auth: { token } } = getState();
+      setAuthToken(token);
+      await axiosInstance.delete(`/post/${postId}`);
+      return postId;
+    } catch (error) {
+      return rejectWithValue(error.response.data.message || 'Could not delete post');
+    }
+  }
+);
+
+export const likePost = createAsyncThunk(
+  'forum/likePost',
+  async (postId, { getState, rejectWithValue }) => {
+    try {
+      const { auth: { token } } = getState();
+      setAuthToken(token);
+      console.log("Sending request to like post with postId:", postId); // Log payload
+      const response = await axiosInstance.post(`/post/${postId}/like`);
+      console.log("Response from like post:", response.data); // Log response
+      return { postId, likes: response.data.likes };
+    } catch (error) {
+      console.error("Error liking post:", error.response?.data || error.message); // Log error
+      return rejectWithValue(error.response.data.message || 'Could not like post');
+    }
+  }
+);
+
+
+
+export const editComment = createAsyncThunk(
+  'forum/editComment',
+  async ({ postId, commentId, content }, { getState, rejectWithValue }) => {
+    try {
+      const { auth: { token } } = getState();
+      setAuthToken(token);
+      const response = await axiosInstance.put(`/post/${postId}/comment/${commentId}`, { content });
+      return { postId, commentId, content: response.data.content };
+    } catch (error) {
+      return rejectWithValue(error.response.data.message || 'Could not edit comment');
+    }
+  }
+);
+
+export const deleteComment = createAsyncThunk(
+  'forum/deleteComment',
+  async ({ postId, commentId }, { getState, rejectWithValue }) => {
+    try {
+      const { auth: { token } } = getState();
+      setAuthToken(token);
+      await axiosInstance.delete(`/post/${postId}/comment/${commentId}`);
+      return { postId, commentId };
+    } catch (error) {
+      return rejectWithValue(error.response.data.message || 'Could not delete comment');
     }
   }
 );
@@ -69,7 +183,6 @@ const forumSlice = createSlice({
     addPost(state, action) {
       state.posts = [action.payload, ...state.posts];
     },
-    // Reducer to add a comment to a specific post
     addCommentToPost(state, action) {
       const { postId, comment } = action.payload;
       const postIndex = state.posts.findIndex(post => post._id === postId);
@@ -77,6 +190,51 @@ const forumSlice = createSlice({
         state.posts[postIndex].comments.push(comment);
       }
     },
+    addReplyToComment(state, action) {
+      const { postId, commentId, reply } = action.payload;
+      const postIndex = state.posts.findIndex(post => post._id === postId);
+      if (postIndex !== -1) {
+        const commentIndex = state.posts[postIndex].comments.findIndex(comment => comment._id === commentId);
+        if (commentIndex !== -1) {
+          state.posts[postIndex].comments[commentIndex].replies.push(reply);
+        }
+      }
+    },
+    updateLikes(state, action) {
+      const { postId, likes } = action.payload;
+      const postIndex = state.posts.findIndex(post => post._id === postId);
+      if (postIndex !== -1) {
+        state.posts[postIndex].likes = likes;
+      }
+    },
+    editPostInState(state, action) {
+      const { postId, content } = action.payload;
+      const postIndex = state.posts.findIndex(post => post._id === postId);
+      if (postIndex !== -1) {
+        state.posts[postIndex].content = content;
+      }
+    },
+    deletePostInState(state, action) {
+      const postId = action.payload;
+      state.posts = state.posts.filter(post => post._id !== postId);
+    },
+    editCommentInState(state, action) {
+      const { postId, commentId, content } = action.payload;
+      const postIndex = state.posts.findIndex(post => post._id === postId);
+      if (postIndex !== -1) {
+        const commentIndex = state.posts[postIndex].comments.findIndex(comment => comment._id === commentId);
+        if (commentIndex !== -1) {
+          state.posts[postIndex].comments[commentIndex].content = content;
+        }
+      }
+    },
+    deleteCommentInState(state, action) {
+      const { postId, commentId } = action.payload;
+      const postIndex = state.posts.findIndex(post => post._id === postId);
+      if (postIndex !== -1) {
+        state.posts[postIndex].comments = state.posts[postIndex].comments.filter(comment => comment._id !== commentId);
+      }
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -96,7 +254,8 @@ const forumSlice = createSlice({
       })
       .addCase(createPost.fulfilled, (state, action) => {
         state.status = 'succeeded';
-        state.posts.unshift(action.payload);
+        // Instead of adding the post here, rely on the socket event to handle this.
+        // state.posts.unshift(action.payload.post);
       })
       .addCase(createPost.rejected, (state, action) => {
         state.status = 'failed';
@@ -116,9 +275,102 @@ const forumSlice = createSlice({
       .addCase(createComment.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.payload || 'Could not add comment';
+      })
+      .addCase(replyToComment.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(replyToComment.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        const { postId, commentId, reply } = action.payload;
+        const postIndex = state.posts.findIndex(post => post._id === postId);
+        if (postIndex !== -1) {
+          const commentIndex = state.posts[postIndex].comments.findIndex(comment => comment._id === commentId);
+          if (commentIndex !== -1) {
+            state.posts[postIndex].comments[commentIndex].replies.push(reply);
+          }
+        }
+      })
+      .addCase(replyToComment.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.payload || 'Could not reply to comment';
+      })
+      .addCase(editPost.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(editPost.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        const { _id: postId, content } = action.payload.post;
+        const postIndex = state.posts.findIndex(post => post._id === postId);
+        if (postIndex !== -1) {
+          state.posts[postIndex].content = content;
+        }
+      })
+      .addCase(editPost.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.payload || 'Could not edit post';
+      })
+      .addCase(deletePost.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(deletePost.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        const postId = action.payload;
+        state.posts = state.posts.filter(post => post._id !== postId);
+      })
+      .addCase(deletePost.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.payload || 'Could not delete post';
+      })
+      .addCase(likePost.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(likePost.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        const { postId, likes } = action.payload;
+        const postIndex = state.posts.findIndex(post => post._id === postId);
+        if (postIndex !== -1) {
+          state.posts[postIndex].likes = likes;
+        }
+      })
+      .addCase(likePost.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.payload || 'Could not like post';
+      })
+      .addCase(editComment.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(editComment.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        const { postId, commentId, content } = action.payload;
+        const postIndex = state.posts.findIndex(post => post._id === postId);
+        if (postIndex !== -1) {
+          const commentIndex = state.posts[postIndex].comments.findIndex(comment => comment._id === commentId);
+          if (commentIndex !== -1) {
+            state.posts[postIndex].comments[commentIndex].content = content;
+          }
+        }
+      })
+      .addCase(editComment.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.payload || 'Could not edit comment';
+      })
+      .addCase(deleteComment.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(deleteComment.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        const { postId, commentId } = action.payload;
+        const postIndex = state.posts.findIndex(post => post._id === postId);
+        if (postIndex !== -1) {
+          state.posts[postIndex].comments = state.posts[postIndex].comments.filter(comment => comment._id !== commentId);
+        }
+      })
+      .addCase(deleteComment.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.payload || 'Could not delete comment';
       });
   },
 });
 
-export const { addPost, addCommentToPost } = forumSlice.actions;
+export const { addPost, addCommentToPost, addReplyToComment, updateLikes, editPostInState, deletePostInState, editCommentInState, deleteCommentInState } = forumSlice.actions;
 export default forumSlice.reducer;

@@ -57,10 +57,12 @@ const authSlice = createSlice({
                 state.status = 'succeeded';
                 state.isAuthenticated = true;
                 state.user = action.payload;
+                console.log('User fetched successfully:', action.payload); // Add this log
             })
             .addCase(fetchUser.rejected, (state, action) => {
                 state.status = 'failed';
                 state.error = action.payload;
+                console.log('Error fetching user:', action.payload); // Add this log
             });
     },
 });
